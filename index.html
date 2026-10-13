@@ -1,0 +1,500 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#102945">
+  <title>乘法星球｜數學探險隊</title>
+  <script src="https://cdn.jsdelivr.net/npm/phaser@3.88.2/dist/phaser.min.js"></script>
+  <style>
+    :root {
+      color-scheme: light;
+      --navy: #102945;
+      --ink: #18334b;
+      --muted: #627b8b;
+      --teal: #167d78;
+      --mint: #dbf4e9;
+      --coral: #ff8068;
+      --paper: #fffdf7;
+    }
+    * { box-sizing: border-box; }
+    body {
+      min-height: 100vh;
+      margin: 0;
+      padding: 30px 18px 42px;
+      color: var(--ink);
+      background:
+        radial-gradient(ellipse at 12% 6%, #235679 0, transparent 27rem),
+        radial-gradient(ellipse at 90% 88%, #174d62 0, transparent 32rem),
+        var(--navy);
+      font-family: "Noto Sans TC", "Microsoft JhengHei", system-ui, sans-serif;
+    }
+    button { font: inherit; }
+    .shell { width: min(100%, 1020px); margin: 0 auto; }
+    .masthead { display: flex; align-items: center; gap: 14px; margin: 0 0 17px 4px; color: white; }
+    .brand-icon {
+      display: grid; width: 48px; height: 48px; flex: 0 0 auto; place-items: center;
+      border: 1px solid #ffffff35; border-radius: 16px; background: #ffffff17; font-size: 25px;
+    }
+    .masthead h1 { margin: 0; font-size: clamp(20px, 3.5vw, 29px); letter-spacing: .04em; }
+    .masthead p { margin: 3px 0 0; color: #bed5df; font-size: 13px; }
+    .badge { margin-left: auto; padding: 8px 13px; border: 1px solid #ffffff35; border-radius: 999px; color: #e9fcf3; background: #ffffff12; font-size: 13px; white-space: nowrap; }
+    .game-card { overflow: hidden; border: 1px solid #d9e8e4; border-radius: 24px; background: var(--paper); box-shadow: 0 22px 70px #071a2b66; }
+    .dashboard { display: grid; grid-template-columns: 1fr auto; gap: 16px 24px; padding: 20px 24px 17px; }
+    .question-block { align-self: center; }
+    .eyebrow { margin: 0 0 4px; color: var(--muted); font-size: 12px; font-weight: 800; letter-spacing: .11em; }
+    .question { margin: 0; color: var(--ink); font-size: clamp(24px, 4vw, 34px); font-weight: 900; letter-spacing: .035em; }
+    .question .equals { color: var(--teal); }
+    .question .unknown { display: inline-grid; min-width: 42px; place-items: center; color: #ea684f; }
+    .stats { display: flex; gap: 9px; align-items: center; }
+    .stat { min-width: 94px; padding: 9px 13px; border-radius: 14px; background: #f0f6f3; text-align: center; }
+    .stat span { display: block; color: var(--muted); font-size: 11px; font-weight: 700; }
+    .stat strong { display: block; margin-top: 1px; color: var(--ink); font-size: 19px; font-variant-numeric: tabular-nums; }
+    .stat.score { background: #fff0dc; }
+    .stat.score strong { color: #a35817; }
+    .progress-row { grid-column: 1 / -1; display: flex; align-items: center; gap: 12px; }
+    .progress-label { flex: 0 0 auto; color: var(--muted); font-size: 12px; font-weight: 700; }
+    .progress-track { height: 8px; flex: 1; overflow: hidden; border-radius: 99px; background: #e6eeea; }
+    .progress-fill { width: 0; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #4bb899, #f1bd54); transition: width .35s ease; }
+    .board-wrap { position: relative; padding: 0 18px; background: var(--paper); }
+    #game { width: 100%; overflow: hidden; border: 1px solid #cfe3dc; border-radius: 19px; background: #dff5ec; }
+    #game canvas { display: block; width: 100% !important; height: auto !important; border-radius: 18px; touch-action: none; }
+    .feedback {
+      position: absolute; z-index: 2; top: 8px; left: 50%; max-width: calc(100% - 38px);
+      padding: 7px 14px; transform: translate(-50%, -5px); border: 1px solid #ffffff;
+      border-radius: 999px; color: var(--ink); background: #fffdf0ed; box-shadow: 0 3px 12px #31584d24;
+      font-size: clamp(12px, 1.7vw, 15px); font-weight: 800; line-height: 1.3; text-align: center;
+      opacity: 0; pointer-events: none; transition: opacity .16s ease, transform .16s ease;
+    }
+    .feedback.visible { transform: translate(-50%, 0); opacity: 1; }
+    .result-overlay { position: absolute; inset: 0 18px; display: grid; place-items: center; border-radius: 19px; background: #102945c9; backdrop-filter: blur(4px); }
+    .result-overlay[hidden] { display: none; }
+    .result-box { width: min(88%, 410px); padding: 25px; border: 1px solid #ffffffa8; border-radius: 23px; background: #fffdf7; text-align: center; box-shadow: 0 15px 50px #071a2b55; }
+    .result-box .trophy { font-size: 42px; }
+    .result-box h2 { margin: 5px 0 7px; font-size: 26px; }
+    .result-box p { margin: 0 0 18px; color: var(--muted); }
+    .restart { border: 0; border-radius: 13px; padding: 12px 21px; color: white; background: var(--teal); font-weight: 800; cursor: pointer; box-shadow: 0 4px 0 #0e5d59; }
+    .restart:hover { background: #116e69; }
+    .restart:focus-visible, .pad button:focus-visible { outline: 3px solid #ffbd4a; outline-offset: 3px; }
+    .below { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 16px 24px 20px; }
+    .hint { display: flex; align-items: flex-start; gap: 11px; color: var(--muted); font-size: 13px; line-height: 1.65; }
+    .hint-icon { display: grid; width: 31px; height: 31px; flex: 0 0 auto; place-items: center; border-radius: 10px; color: var(--teal); background: #e4f3ee; font-size: 15px; }
+    .hint strong { color: var(--ink); }
+    .pad { display: none; grid-template-columns: repeat(3, 42px); grid-template-rows: repeat(2, 38px); gap: 4px; flex: 0 0 auto; }
+    .pad button { border: 1px solid #cbded7; border-radius: 10px; color: var(--ink); background: #f3f8f5; font-size: 15px; font-weight: 800; touch-action: none; user-select: none; }
+    .pad button:active, .pad button[aria-pressed="true"] { color: white; background: var(--teal); }
+    .pad .up { grid-column: 2; }
+    .pad .left { grid-column: 1; grid-row: 2; }
+    .pad .down { grid-column: 2; grid-row: 2; }
+    .pad .right { grid-column: 3; grid-row: 2; }
+    .fallback { padding: 25px; color: #883c20; text-align: center; }
+    @media (pointer: coarse), (max-width: 700px) { .pad { display: grid; } }
+    @media (max-width: 620px) {
+      body { padding: 18px 10px 25px; }
+      .masthead { gap: 10px; margin-left: 2px; }
+      .brand-icon { width: 42px; height: 42px; border-radius: 13px; }
+      .masthead p { font-size: 11px; }
+      .badge { padding: 7px 9px; font-size: 11px; }
+      .dashboard { grid-template-columns: 1fr; gap: 11px; padding: 17px 16px 13px; }
+      .question-block { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+      .eyebrow { margin: 0; font-size: 10px; }
+      .question { font-size: clamp(23px, 7vw, 31px); }
+      .stats { display: grid; grid-template-columns: repeat(3, 1fr); }
+      .stat { min-width: 0; padding: 7px 6px; }
+      .stat strong { font-size: 17px; }
+      .progress-row { gap: 8px; }
+      .board-wrap { padding: 0 9px; }
+      .result-overlay { inset: 0 9px; }
+      #game, #game canvas { border-radius: 13px; }
+      .below { align-items: center; gap: 8px; padding: 12px 14px 15px; }
+      .hint { gap: 8px; font-size: 11px; }
+      .hint-icon { width: 27px; height: 27px; }
+      .pad { grid-template-columns: repeat(3, 36px); grid-template-rows: repeat(2, 34px); }
+    }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; } }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header class="masthead">
+      <div class="brand-icon" aria-hidden="true">🚀</div>
+      <div>
+        <h1>乘法星球</h1>
+        <p>數學探險隊・找出星星上的正確答案！</p>
+      </div>
+      <div class="badge">✦ 5 關冒險</div>
+    </header>
+
+    <section class="game-card" aria-label="乘法星球遊戲">
+      <div class="dashboard">
+        <div class="question-block" aria-live="polite">
+          <p class="eyebrow" id="question-label">第 1 關・第 1 題</p>
+          <p class="question" id="question">2 × 3 <span class="equals">=</span> <span class="unknown">?</span></p>
+        </div>
+        <div class="stats" aria-label="遊戲進度">
+          <div class="stat"><span>關卡</span><strong id="stage-stat">1 / 5</strong></div>
+          <div class="stat"><span>本關題數</span><strong id="round-stat">1 / 3</strong></div>
+          <div class="stat score"><span>探險分數</span><strong id="score-stat">0</strong></div>
+        </div>
+        <div class="progress-row" aria-label="總進度">
+          <span class="progress-label" id="progress-label">星球探索 0 / 15 題</span>
+          <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+        </div>
+      </div>
+
+      <div class="board-wrap">
+        <div class="feedback" id="feedback" role="status" aria-live="polite"></div>
+        <div id="game" aria-label="使用方向鍵或 WASD 移動太空探險員，碰觸答案星星作答"></div>
+        <div class="result-overlay" id="result-overlay" hidden>
+          <div class="result-box">
+            <div class="trophy" aria-hidden="true">🏆</div>
+            <h2>星際任務完成！</h2>
+            <p id="final-score">你完成了 5 個關卡！</p>
+            <button class="restart" id="restart-button" type="button">再玩一次</button>
+          </div>
+        </div>
+      </div>
+
+      <footer class="below">
+        <div class="hint">
+          <div class="hint-icon" aria-hidden="true">✦</div>
+          <div><strong>移動角色碰星星作答</strong><br>答對 +10 分，答錯 −5 分。鍵盤用方向鍵／WASD，也可用畫面方向鍵。</div>
+        </div>
+        <div class="pad" aria-label="觸控方向鍵">
+          <button class="up" data-direction="up" aria-label="向上" aria-pressed="false">▲</button>
+          <button class="left" data-direction="left" aria-label="向左" aria-pressed="false">◀</button>
+          <button class="down" data-direction="down" aria-label="向下" aria-pressed="false">▼</button>
+          <button class="right" data-direction="right" aria-label="向右" aria-pressed="false">▶</button>
+        </div>
+      </footer>
+    </section>
+  </main>
+
+  <script>
+    (() => {
+      const stages = [
+        [{ a: 2, b: 3 }, { a: 4, b: 2 }, { a: 5, b: 3 }],
+        [{ a: 3, b: 6 }, { a: 4, b: 7 }, { a: 8, b: 3 }],
+        [{ a: 6, b: 7 }, { a: 8, b: 6 }, { a: 9, b: 4 }],
+        [{ a: 7, b: 8 }, { a: 9, b: 6 }, { a: 8, b: 9 }],
+        [{ a: 12, b: 7 }, { a: 11, b: 8 }, { a: 12, b: 9 }]
+      ];
+      const totalQuestions = stages.reduce((sum, stage) => sum + stage.length, 0);
+      const ui = {
+        question: document.getElementById('question'),
+        questionLabel: document.getElementById('question-label'),
+        stage: document.getElementById('stage-stat'),
+        round: document.getElementById('round-stat'),
+        score: document.getElementById('score-stat'),
+        progressLabel: document.getElementById('progress-label'),
+        progressFill: document.getElementById('progress-fill'),
+        overlay: document.getElementById('result-overlay'),
+        finalScore: document.getElementById('final-score'),
+        restart: document.getElementById('restart-button'),
+        feedback: document.getElementById('feedback')
+      };
+
+      if (!window.Phaser) {
+        document.getElementById('game').innerHTML = '<div class="fallback">遊戲引擎載入失敗，請確認網路連線後重新整理頁面。</div>';
+        return;
+      }
+
+      const touchDirections = { up: false, down: false, left: false, right: false };
+      document.querySelectorAll('.pad button').forEach((button) => {
+        const direction = button.dataset.direction;
+        const release = () => {
+          touchDirections[direction] = false;
+          button.setAttribute('aria-pressed', 'false');
+        };
+        button.addEventListener('pointerdown', (event) => {
+          event.preventDefault();
+          touchDirections[direction] = true;
+          button.setAttribute('aria-pressed', 'true');
+          button.setPointerCapture(event.pointerId);
+        });
+        button.addEventListener('pointerup', release);
+        button.addEventListener('pointercancel', release);
+        button.addEventListener('lostpointercapture', release);
+        button.addEventListener('contextmenu', (event) => event.preventDefault());
+      });
+
+      class StarIsland extends Phaser.Scene {
+        constructor() {
+          super('StarIsland');
+          this.stageIndex = 0;
+          this.questionIndex = 0;
+          this.score = 0;
+          this.solved = 0;
+          this.acceptingAnswer = true;
+          this.targets = [];
+          this.feedbackTimer = null;
+        }
+
+        create() {
+          this.drawIsland();
+          this.makeTextures();
+          this.physics.world.setBounds(42, 38, 876, 364);
+          this.player = this.physics.add.sprite(480, 365, 'explorer');
+          this.player.setCollideWorldBounds(true);
+          this.player.body.setSize(34, 38).setOffset(19, 32);
+          this.cursors = this.input.keyboard.createCursorKeys();
+          this.wasd = this.input.keyboard.addKeys('W,A,S,D');
+          this.orbs = this.physics.add.group({ allowGravity: false, immovable: true });
+          this.physics.add.overlap(this.player, this.orbs, this.collectAnswer, undefined, this);
+          this.spawnQuestion();
+          this.input.keyboard.on('keydown-ENTER', () => {
+            if (!ui.overlay.hidden) this.restartGame();
+          });
+        }
+
+        drawIsland() {
+          const g = this.add.graphics();
+          g.fillStyle(0xdff5ec, 1).fillRoundedRect(18, 17, 924, 406, 25);
+          g.lineStyle(2, 0xc4e5d8, 1).strokeRoundedRect(18, 17, 924, 406, 25);
+          // Soft islands, flower patches and drifting stars add landmarks without blocking movement.
+          const islands = [
+            [100, 78, 57, 25, 0xc7eadb], [853, 85, 64, 28, 0xc8ebdc],
+            [83, 345, 52, 24, 0xc9ecdc], [880, 343, 65, 29, 0xc7eadb],
+            [293, 63, 35, 15, 0xd1efe2], [675, 374, 42, 18, 0xd1efe2]
+          ];
+          islands.forEach(([x, y, rx, ry, color]) => {
+            g.fillStyle(color, 1).fillEllipse(x, y, rx * 2, ry * 2);
+            g.fillStyle(0x91cdae, .75).fillCircle(x - rx * .38, y + 3, 4);
+            g.fillStyle(0x91cdae, .75).fillCircle(x + rx * .25, y - 2, 3);
+          });
+          // Dotted trail marks the island path.
+          g.fillStyle(0xffffff, .68);
+          [[205,94],[243,99],[281,103],[319,106],[642,97],[679,92],[716,89],
+           [185,342],[220,350],[255,356],[705,352],[741,346],[777,340]].forEach(([x,y]) => g.fillCircle(x,y,3));
+          // Tiny four-point stars.
+          [[150,151],[811,271],[315,317],[620,152],[440,86],[543,352]].forEach(([x,y], i) => {
+            const color = i % 2 ? 0xf6c65b : 0x78bdae;
+            g.fillStyle(color, .82);
+            g.fillPoints([
+              new Phaser.Geom.Point(x, y - 8), new Phaser.Geom.Point(x + 2, y - 2),
+              new Phaser.Geom.Point(x + 8, y), new Phaser.Geom.Point(x + 2, y + 2),
+              new Phaser.Geom.Point(x, y + 8), new Phaser.Geom.Point(x - 2, y + 2),
+              new Phaser.Geom.Point(x - 8, y), new Phaser.Geom.Point(x - 2, y - 2)
+            ], true);
+          });
+          // Bottom-edge shrubs frame the play space.
+          [[361,400],[379,397],[398,401],[565,401],[583,396],[602,400]].forEach(([x,y], i) => {
+            g.fillStyle(i % 2 ? 0x68b996 : 0x83caa7, 1).fillCircle(x,y,8);
+          });
+          g.destroy();
+          this.add.text(38, 27, '✦ 星島探險區', {
+            fontFamily: 'system-ui, sans-serif', fontSize: '12px', fontStyle: 'bold', color: '#537b70'
+          }).setDepth(3);
+        }
+
+        makeTextures() {
+          const hero = this.make.graphics({ x: 0, y: 0, add: false });
+          hero.fillStyle(0x2c7d72, .18).fillEllipse(36, 78, 39, 10);
+          hero.fillStyle(0xf07862, 1).fillTriangle(21, 53, 8, 75, 31, 69);
+          hero.fillStyle(0xffb56c, 1).fillTriangle(48, 53, 64, 75, 39, 69);
+          hero.fillStyle(0x277d88, 1).fillRoundedRect(18, 42, 37, 30, 12);
+          hero.lineStyle(3, 0xffffff, 1).strokeRoundedRect(18, 42, 37, 30, 12);
+          hero.fillStyle(0xffd36e, 1).fillCircle(36, 55, 5);
+          hero.fillStyle(0xffd1a0, 1).fillCircle(36, 29, 20);
+          hero.lineStyle(3, 0xffffff, 1).strokeCircle(36, 29, 20);
+          hero.fillStyle(0x18334b, 1).fillCircle(29, 29, 2.1).fillCircle(43, 29, 2.1);
+          hero.lineStyle(2, 0xc26651, 1).beginPath().arc(36, 31, 6, .25, Math.PI - .25, false).strokePath();
+          hero.fillStyle(0x5a78a8, 1).fillTriangle(17, 18, 36, 2, 55, 18);
+          hero.fillStyle(0x7898c4, 1).fillRoundedRect(20, 14, 32, 7, 4);
+          hero.fillStyle(0xffd36e, 1).fillPoints([
+            new Phaser.Geom.Point(36, 3), new Phaser.Geom.Point(38, 8),
+            new Phaser.Geom.Point(43, 10), new Phaser.Geom.Point(38, 12),
+            new Phaser.Geom.Point(36, 17), new Phaser.Geom.Point(34, 12),
+            new Phaser.Geom.Point(29, 10), new Phaser.Geom.Point(34, 8)
+          ], true);
+          hero.generateTexture('explorer', 72, 84);
+          hero.destroy();
+
+          const orb = this.make.graphics({ x: 0, y: 0, add: false });
+          orb.fillStyle(0x3a786d, .13).fillEllipse(48, 53, 66, 16);
+          orb.fillStyle(0xfffdf7, 1).fillCircle(48, 45, 38);
+          orb.lineStyle(4, 0xf1bd54, 1).strokeCircle(48, 45, 38);
+          orb.lineStyle(2, 0xffffff, .95).strokeCircle(48, 45, 31);
+          orb.fillStyle(0xffe7a1, 1).fillCircle(23, 17, 5).fillCircle(77, 24, 3);
+          orb.fillStyle(0xffffff, 1).fillCircle(35, 18, 3).fillCircle(77, 67, 2.5);
+          orb.generateTexture('answer-orb', 96, 62);
+          orb.destroy();
+        }
+
+        spawnQuestion() {
+          const q = stages[this.stageIndex][this.questionIndex];
+          const answer = q.a * q.b;
+          const distractors = this.makeDistractors(answer, q.a, q.b);
+          const choices = Phaser.Utils.Array.Shuffle([answer, ...distractors]);
+          const anchors = Phaser.Utils.Array.Shuffle([[160, 157], [480, 246], [800, 157]]);
+          this.acceptingAnswer = true;
+          this.clearTargets();
+          this.player.setVelocity(0, 0);
+          this.updateUI();
+          this.addToast(`尋找 ${answer}！`, '#18334b', 650);
+          choices.forEach((value, index) => {
+            const [x, y] = anchors[index];
+            const orb = this.physics.add.sprite(x, y, 'answer-orb');
+            orb.body.setCircle(29, 19, 14);
+            orb.setImmovable(true);
+            orb.setData('answer', value);
+            orb.setData('correct', value === answer);
+            orb.setData('baseY', y);
+            orb.setData('phase', Math.random() * Math.PI * 2);
+            const label = this.add.text(x, y - 9, String(value), {
+              fontFamily: 'system-ui, sans-serif', fontSize: value > 99 ? '23px' : '27px',
+              fontStyle: '900', color: '#18334b', stroke: '#fffdf7', strokeThickness: 1
+            }).setOrigin(.5).setDepth(4);
+            orb.setDepth(3);
+            orb.setData('label', label);
+            this.orbs.add(orb);
+            this.targets.push(orb);
+          });
+        }
+
+        makeDistractors(answer, a, b) {
+          const candidates = [answer + a, answer - a, answer + b, answer - b, answer + 2, answer - 2, answer + 3, answer - 3];
+          const unique = [...new Set(candidates.filter(value => value > 0 && value !== answer))];
+          Phaser.Utils.Array.Shuffle(unique);
+          return unique.slice(0, 2);
+        }
+
+        collectAnswer(player, orb) {
+          if (!this.acceptingAnswer || !orb.active) return;
+          this.acceptingAnswer = false;
+          const answer = stages[this.stageIndex][this.questionIndex].a * stages[this.stageIndex][this.questionIndex].b;
+          const isCorrect = orb.getData('correct');
+          this.player.setVelocity(0, 0);
+          if (isCorrect) {
+            this.score += 10;
+            this.solved += 1;
+            this.updateUI();
+            this.addToast('答對了！ +10 分　✦', '#167d78', 900);
+            this.tweens.add({ targets: orb, scale: 1.45, alpha: 0, duration: 280, ease: 'Back.easeIn', onComplete: () => this.advance() });
+          } else {
+            this.score -= 5;
+            this.updateUI();
+            this.addToast(`再試試看！ −5 分　提示：答案是 ${answer}`, '#b64f46', 1450);
+            this.tweens.add({ targets: orb, scale: .6, alpha: 0, duration: 250, onComplete: () => orb.destroy() });
+            this.time.delayedCall(1450, () => { this.acceptingAnswer = true; });
+          }
+        }
+
+        advance() {
+          this.questionIndex += 1;
+          if (this.questionIndex >= stages[this.stageIndex].length) {
+            this.stageIndex += 1;
+            this.questionIndex = 0;
+          }
+          if (this.stageIndex >= stages.length) {
+            this.finishGame();
+          } else {
+            this.spawnQuestion();
+          }
+        }
+
+        clearTargets() {
+          this.targets.forEach((orb) => {
+            const label = orb.getData('label');
+            if (label) label.destroy();
+            if (orb.active) orb.destroy();
+          });
+          this.targets = [];
+        }
+
+        addToast(message, color, duration) {
+          if (this.feedbackTimer) this.feedbackTimer.remove();
+          ui.feedback.textContent = message;
+          ui.feedback.style.color = color;
+          ui.feedback.classList.add('visible');
+          this.feedbackTimer = this.time.delayedCall(duration, () => ui.feedback.classList.remove('visible'));
+        }
+
+        updateUI() {
+          const isComplete = this.stageIndex >= stages.length;
+          if (!isComplete) {
+            const q = stages[this.stageIndex][this.questionIndex];
+            ui.question.innerHTML = `${q.a} × ${q.b} <span class="equals">=</span> <span class="unknown">?</span>`;
+            ui.questionLabel.textContent = `第 ${this.stageIndex + 1} 關・第 ${this.questionIndex + 1} 題`;
+            ui.stage.textContent = `${this.stageIndex + 1} / ${stages.length}`;
+            ui.round.textContent = `${this.questionIndex + 1} / ${stages[this.stageIndex].length}`;
+          }
+          ui.score.textContent = String(this.score);
+          ui.progressLabel.textContent = `星球探索 ${this.solved} / ${totalQuestions} 題`;
+          ui.progressFill.style.width = `${(this.solved / totalQuestions) * 100}%`;
+        }
+
+        finishGame() {
+          this.acceptingAnswer = false;
+          this.clearTargets();
+          this.player.setVelocity(0, 0);
+          ui.question.innerHTML = '任務完成 <span class="equals">✦</span>';
+          ui.questionLabel.textContent = '乘法星球探險隊・全關通過';
+          ui.stage.textContent = '5 / 5';
+          ui.round.textContent = '15 / 15';
+          ui.finalScore.textContent = `你完成了 5 個關卡、15 道乘法題，得到 ${this.score} 分！`;
+          ui.overlay.hidden = false;
+          this.addToast('太厲害了！全關完成！', '#167d78', 2000);
+        }
+
+        restartGame() {
+          this.stageIndex = 0;
+          this.questionIndex = 0;
+          this.score = 0;
+          this.solved = 0;
+          this.player.setPosition(480, 365).setVelocity(0, 0);
+          Object.keys(touchDirections).forEach(direction => { touchDirections[direction] = false; });
+          ui.overlay.hidden = true;
+          this.spawnQuestion();
+        }
+
+        update(time) {
+          if (!this.acceptingAnswer) {
+            this.player.setVelocity(0, 0);
+          } else {
+            const left = this.cursors.left.isDown || this.wasd.A.isDown || touchDirections.left;
+            const right = this.cursors.right.isDown || this.wasd.D.isDown || touchDirections.right;
+            const up = this.cursors.up.isDown || this.wasd.W.isDown || touchDirections.up;
+            const down = this.cursors.down.isDown || this.wasd.S.isDown || touchDirections.down;
+            const dx = Number(right) - Number(left);
+            const dy = Number(down) - Number(up);
+            const length = Math.hypot(dx, dy) || 1;
+            const speed = 220;
+            this.player.setVelocity((dx / length) * speed, (dy / length) * speed);
+            if (dx < 0) this.player.setFlipX(true);
+            if (dx > 0) this.player.setFlipX(false);
+          }
+          this.targets.forEach((orb) => {
+            if (!orb.active) return;
+            const bob = Math.sin(time / 430 + orb.getData('phase')) * 7;
+            orb.y = orb.getData('baseY') + bob;
+            orb.getData('label').setPosition(orb.x, orb.y - 9);
+          });
+          if (this.player.body && this.player.body.speed > 5) {
+            this.player.setAngle(Math.sin(time / 70) * 2);
+          } else {
+            this.player.setAngle(0);
+          }
+        }
+      }
+
+      const game = new Phaser.Game({
+        type: Phaser.AUTO,
+        parent: 'game',
+        width: 960,
+        height: 440,
+        backgroundColor: '#dff5ec',
+        physics: { default: 'arcade', arcade: { gravity: { x: 0, y: 0 }, debug: false } },
+        scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_BOTH },
+        scene: StarIsland,
+        render: { antialias: true, pixelArt: false },
+        input: { keyboard: { target: window } }
+      });
+      ui.restart.addEventListener('click', () => {
+        const scene = game.scene.getScene('StarIsland');
+        if (scene && scene.scene.isActive()) scene.restartGame();
+      });
+    })();
+  </script>
+</body>
+</html>
