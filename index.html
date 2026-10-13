@@ -227,6 +227,7 @@
           this.solved = 0;
           this.acceptingAnswer = true;
           this.targets = [];
+          this.labels = [];
           this.feedbackTimer = null;
         }
 
@@ -312,44 +313,55 @@
 
           const orb = this.make.graphics({ x: 0, y: 0, add: false });
           orb.fillStyle(0x3a786d, .13).fillEllipse(48, 53, 66, 16);
-          orb.fillStyle(0xfffdf7, 1).fillCircle(48, 45, 38);
-          orb.lineStyle(4, 0xf1bd54, 1).strokeCircle(48, 45, 38);
-          orb.lineStyle(2, 0xffffff, .95).strokeCircle(48, 45, 31);
+          orb.fillStyle(0xfffdf7, 1).fillCircle(48, 48, 38);
+          orb.lineStyle(4, 0xf1bd54, 1).strokeCircle(48, 48, 38);
+          orb.lineStyle(2, 0xffffff, .95).strokeCircle(48, 48, 31);
           orb.fillStyle(0xffe7a1, 1).fillCircle(23, 17, 5).fillCircle(77, 24, 3);
           orb.fillStyle(0xffffff, 1).fillCircle(35, 18, 3).fillCircle(77, 67, 2.5);
-          orb.generateTexture('answer-orb', 96, 62);
+          orb.generateTexture('answer-orb', 96, 96);
           orb.destroy();
         }
 
-        spawnQuestion() {
+        spawnQuestion({ gracePeriod = false } = {}) {
           const q = stages[this.stageIndex][this.questionIndex];
           const answer = q.a * q.b;
           const distractors = this.makeDistractors(answer, q.a, q.b);
           const choices = Phaser.Utils.Array.Shuffle([answer, ...distractors]);
           const anchors = Phaser.Utils.Array.Shuffle([[160, 157], [480, 246], [800, 157]]);
-          this.acceptingAnswer = true;
+          this.acceptingAnswer = !gracePeriod;
           this.clearTargets();
-          this.player.setVelocity(0, 0);
+          // Each question starts from the safe launch pad so the previous answer
+          // position cannot overlap a new orb and trigger an accidental penalty.
+          this.player.setPosition(480, 365).setVelocity(0, 0);
           this.updateUI();
-          this.addToast(`尋找 ${answer}！`, '#18334b', 650);
+          this.addToast(gracePeriod ? '準備下一題…' : `尋找 ${answer}！`, '#18334b', gracePeriod ? 800 : 650);
           choices.forEach((value, index) => {
             const [x, y] = anchors[index];
             const orb = this.physics.add.sprite(x, y, 'answer-orb');
-            orb.body.setCircle(29, 19, 14);
+            orb.body.setCircle(29, 19, 19);
             orb.setImmovable(true);
             orb.setData('answer', value);
             orb.setData('correct', value === answer);
             orb.setData('baseY', y);
             orb.setData('phase', Math.random() * Math.PI * 2);
             const label = this.add.text(x, y - 9, String(value), {
-              fontFamily: 'system-ui, sans-serif', fontSize: value > 99 ? '23px' : '27px',
+              fontFamily: 'system-ui, sans-serif', fontSize: value > 99 ? '20px' : value > 9 ? '24px' : '27px',
               fontStyle: '900', color: '#18334b', stroke: '#fffdf7', strokeThickness: 1
             }).setOrigin(.5).setDepth(4);
+            label.setPosition(x, y);
             orb.setDepth(3);
             orb.setData('label', label);
             this.orbs.add(orb);
             this.targets.push(orb);
+            this.labels.push(label);
           });
+          if (gracePeriod) {
+            this.time.delayedCall(800, () => {
+              if (!this.scene.isActive() || this.stageIndex >= stages.length || this.acceptingAnswer) return;
+              this.acceptingAnswer = true;
+              this.addToast(`尋找 ${answer}！`, '#18334b', 650);
+            });
+          }
         }
 
         makeDistractors(answer, a, b) {
@@ -364,18 +376,22 @@
           this.acceptingAnswer = false;
           const answer = stages[this.stageIndex][this.questionIndex].a * stages[this.stageIndex][this.questionIndex].b;
           const isCorrect = orb.getData('correct');
+          const label = orb.getData('label');
           this.player.setVelocity(0, 0);
           if (isCorrect) {
             this.score += 10;
             this.solved += 1;
             this.updateUI();
             this.addToast('答對了！ +10 分　✦', '#167d78', 900);
-            this.tweens.add({ targets: orb, scale: 1.45, alpha: 0, duration: 280, ease: 'Back.easeIn', onComplete: () => this.advance() });
+            this.tweens.add({ targets: [orb, label], scale: 1.45, alpha: 0, duration: 280, ease: 'Back.easeIn', onComplete: () => this.advance() });
           } else {
             this.score -= 5;
             this.updateUI();
             this.addToast(`再試試看！ −5 分　提示：答案是 ${answer}`, '#b64f46', 1450);
-            this.tweens.add({ targets: orb, scale: .6, alpha: 0, duration: 250, onComplete: () => orb.destroy() });
+            this.tweens.add({
+              targets: [orb, label], scale: .6, alpha: 0, duration: 250,
+              onComplete: () => { orb.destroy(); label.destroy(); }
+            });
             this.time.delayedCall(1450, () => { this.acceptingAnswer = true; });
           }
         }
@@ -389,16 +405,16 @@
           if (this.stageIndex >= stages.length) {
             this.finishGame();
           } else {
-            this.spawnQuestion();
+            this.spawnQuestion({ gracePeriod: true });
           }
         }
 
         clearTargets() {
-          this.targets.forEach((orb) => {
-            const label = orb.getData('label');
-            if (label) label.destroy();
-            if (orb.active) orb.destroy();
-          });
+          // Keep labels independently: destroying a missed orb clears its data,
+          // so looking up labels only through the orb can leave old numbers behind.
+          this.labels.forEach((label) => { if (label.active) label.destroy(); });
+          this.labels = [];
+          this.targets.forEach((orb) => { if (orb.active) orb.destroy(); });
           this.targets = [];
         }
 
@@ -468,7 +484,7 @@
             if (!orb.active) return;
             const bob = Math.sin(time / 430 + orb.getData('phase')) * 7;
             orb.y = orb.getData('baseY') + bob;
-            orb.getData('label').setPosition(orb.x, orb.y - 9);
+            orb.getData('label').setPosition(orb.x, orb.y);
           });
           if (this.player.body && this.player.body.speed > 5) {
             this.player.setAngle(Math.sin(time / 70) * 2);
