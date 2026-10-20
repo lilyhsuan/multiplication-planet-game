@@ -95,6 +95,9 @@
       class MechanismDemo extends Phaser.Scene {
         constructor() {
           super('MechanismDemo');
+        }
+
+        init() {
           this.index = 0;
           this.score = 0;
           this.lives = 3;
@@ -107,6 +110,12 @@
           this.timerEvent = null;
           this.questionTime = 15;
           this.choiceItems = [];
+          scoreText.textContent = '0';
+          progressText.textContent = `1 / ${prompts.length}`;
+          livesText.textContent = '♥ ♥ ♥';
+          timerText.textContent = '15';
+          message.textContent = notes[mode];
+          routeButtons.forEach((button) => button.setAttribute('aria-pressed', 'false'));
         }
 
         create() {
@@ -114,12 +123,12 @@
           this.hudText = this.add.text(220, 17, '', { fontFamily: 'system-ui, sans-serif', fontSize: '14px', fontStyle: 'bold', color: '#365b3b' }).setOrigin(.5);
           this.hintText = this.add.text(220, 44, '', { fontFamily: 'system-ui, sans-serif', fontSize: '10px', fontStyle: 'bold', color: '#637461', align: 'center', wordWrap: { width: 410 } }).setOrigin(.5);
           this.routeButtons = routeButtons;
-          this.routeButtons.forEach((button) => button.addEventListener('click', () => {
+          this.routeButtons.forEach((button) => { button.onclick = () => {
             if (mode !== 'choice' || this.resolved) return;
             this.route = button.dataset.route;
             this.routeButtons.forEach((item) => item.setAttribute('aria-pressed', String(item === button)));
             message.textContent = this.route === 'risky' ? '已選冒險捷徑，答對加分較多，答錯扣分也較多。' : '已選安全小徑，穩穩收集森林路標。';
-          }));
+          }; });
           this.showQuestion();
         }
 
