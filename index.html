@@ -299,15 +299,30 @@
           hero.generateTexture('explorer', 72, 84);
           hero.destroy();
 
-          const orb = this.make.graphics({ x: 0, y: 0, add: false });
-          orb.fillStyle(0x3a786d, .13).fillEllipse(48, 53, 66, 16);
-          orb.fillStyle(0xfffdf7, 1).fillCircle(48, 48, 38);
-          orb.lineStyle(4, 0xf1bd54, 1).strokeCircle(48, 48, 38);
-          orb.lineStyle(2, 0xffffff, .95).strokeCircle(48, 48, 31);
-          orb.fillStyle(0xffe7a1, 1).fillCircle(23, 17, 5).fillCircle(77, 24, 3);
-          orb.fillStyle(0xffffff, 1).fillCircle(35, 18, 3).fillCircle(77, 67, 2.5);
-          orb.generateTexture('answer-orb', 96, 96);
-          orb.destroy();
+          const planets = [
+            { key: 'answer-planet-0', base: 0x4da9d2, land: 0x83d6ad, accent: 0xffd36e },
+            { key: 'answer-planet-1', base: 0xe77f69, land: 0xffc17b, accent: 0xffe8a0 },
+            { key: 'answer-planet-2', base: 0x887bd1, land: 0xc3a5ed, accent: 0x76d8cb }
+          ];
+          planets.forEach((planet, index) => {
+            const g = this.make.graphics({ x: 0, y: 0, add: false });
+            // A broad orbit and shadow make each answer read as a planet at a glance.
+            g.lineStyle(5, planet.accent, .9).strokeEllipse(64, 66, 118, 44);
+            g.fillStyle(0x315c69, .2).fillEllipse(64, 82, 86, 16);
+            g.fillStyle(planet.base, 1).fillCircle(64, 62, 48);
+            g.lineStyle(3, 0xffffff, .75).strokeCircle(64, 62, 45);
+            if (index === 0) {
+              g.fillStyle(planet.land, .95).fillEllipse(48, 47, 23, 17).fillEllipse(75, 73, 19, 13).fillEllipse(78, 42, 12, 9);
+            } else if (index === 1) {
+              g.fillStyle(planet.land, .95).fillEllipse(49, 43, 32, 13).fillEllipse(71, 59, 37, 12).fillEllipse(53, 76, 30, 10);
+            } else {
+              g.fillStyle(planet.land, .95).fillEllipse(47, 51, 20, 18).fillEllipse(72, 45, 17, 12).fillEllipse(69, 73, 25, 11);
+            }
+            g.fillStyle(planet.accent, .82).fillCircle(39, 65, 4).fillCircle(83, 61, 3);
+            g.fillStyle(0xffffff, .6).fillEllipse(49, 30, 20, 7);
+            g.generateTexture(planet.key, 128, 128);
+            g.destroy();
+          });
         }
 
         spawnQuestion({ gracePeriod = false } = {}) {
@@ -327,16 +342,16 @@
           this.addToast(gracePeriod ? '準備下一題…' : `完成 ${stage.name} 的乘法任務！找出 ${answer}`, '#18334b', gracePeriod ? 800 : 900);
           choices.forEach((value, index) => {
             const [x, y] = anchors[index];
-            const orb = this.physics.add.sprite(x, y, 'answer-orb');
-            orb.body.setCircle(29, 19, 19);
+            const orb = this.physics.add.sprite(x, y, `answer-planet-${index}`);
+            orb.body.setCircle(44, 20, 20);
             orb.setImmovable(true);
             orb.setData('answer', value);
             orb.setData('correct', value === answer);
             orb.setData('baseY', y);
             orb.setData('phase', Math.random() * Math.PI * 2);
             const label = this.add.text(x, y - 9, String(value), {
-              fontFamily: 'system-ui, sans-serif', fontSize: value > 99 ? '20px' : value > 9 ? '24px' : '27px',
-              fontStyle: '900', color: '#18334b', stroke: '#fffdf7', strokeThickness: 1
+              fontFamily: 'system-ui, sans-serif', fontSize: value > 99 ? '25px' : value > 9 ? '30px' : '34px',
+              fontStyle: '900', color: '#18334b', stroke: '#fffdf7', strokeThickness: 3
             }).setOrigin(.5).setDepth(4);
             label.setPosition(x, y);
             orb.setDepth(3);
