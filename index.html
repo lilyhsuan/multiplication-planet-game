@@ -295,6 +295,9 @@
 
         showIntro() {
           this.acceptingAnswer = false;
+          if (this.feedbackTimer) this.feedbackTimer.remove();
+          this.feedbackTimer = null;
+          ui.feedback.classList.remove('visible');
           ui.resultIcon.textContent = '🧑‍🚀';
           ui.resultTitle.textContent = '太空人迷航了！';
           ui.finalScore.textContent = '太空人不小心脫離軌道，找不到回地球的路。解開五關乘法任務，幫他拼回返航路線。答對 +10 分，答錯 −5 分並消耗一次救援機會。答錯三次，外星人就會抓走他吃掉！';
