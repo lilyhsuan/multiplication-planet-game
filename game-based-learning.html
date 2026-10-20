@@ -113,6 +113,31 @@
       margin-top: 27px;
     }
 
+    .full-game-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin: -18px 0 30px;
+    }
+
+    .full-game-link {
+      display: flex;
+      min-height: 58px;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 16px;
+      border: 1px solid #d4e4dc;
+      border-radius: 15px;
+      color: #285348;
+      background: #fffdf7;
+      font-weight: 850;
+      text-decoration: none;
+      box-shadow: 0 6px 20px #173c3510;
+    }
+
+    .full-game-link:hover { color: #1a665b; border-color: #96b8a7; }
+    .full-game-link small { display: block; color: #708078; font-size: 11px; font-weight: 650; }
+
     .btn-teal {
       border: 1px solid var(--teal);
       color: white;
@@ -469,7 +494,7 @@
       }
 
       .game-embed {
-        min-height: 190px;
+        min-height: 260px;
       }
     }
 
@@ -487,7 +512,7 @@
 
   <nav class="navbar navbar-expand-lg site-nav" aria-label="主要導覽">
     <div class="container">
-      <a class="navbar-brand d-flex align-items-center" href="#top">
+      <a class="navbar-brand d-flex align-items-center" href="./index.html">
         <span class="brand-mark" aria-hidden="true">✦</span>
         <span>遊戲式學習實驗室</span>
       </a>
@@ -499,6 +524,7 @@
           <li class="nav-item"><a class="nav-link" href="#about">認識學習</a></li>
           <li class="nav-item"><a class="nav-link" href="#mechanisms">十種機制</a></li>
           <li class="nav-item"><a class="nav-link" href="#sources">參考資料</a></li>
+          <li class="nav-item"><a class="nav-link" href="./index.html">遊戲入口</a></li>
         </ul>
       </div>
     </div>
@@ -541,7 +567,12 @@
       <div class="container">
         <p class="section-kicker">TEN MECHANICS TO TRY</p>
         <h2 class="section-title">十種適合帶進課堂的遊戲機制</h2>
-        <p class="section-intro mb-5">十個範例都使用太空人解乘法題、蒐集返航座標的同一玩法核心，但每個遊戲各自加入不同規則。你可以直接操作，也能把任一遊戲切換成全螢幕。</p>
+        <p class="section-intro mb-5">十個範例是精簡的 Phaser 互動示範，各自呈現一種遊戲機制。下方另有兩款完整作品，分別從機制示範延伸出森林動物故事與乘法星球冒險。</p>
+
+        <div class="full-game-links" aria-label="前往完整遊戲作品">
+          <a class="full-game-link" href="./forest-adventure.html"><span aria-hidden="true">🌲</span><span>森林冒險完整作品<small>由任務目標與動物故事延伸</small></span></a>
+          <a class="full-game-link" href="./multiplication-planet.html"><span aria-hidden="true">🪐</span><span>乘法星球完整作品<small>由漸進難度機制延伸</small></span></a>
+        </div>
 
         <div class="mechanism-layout">
           <nav class="mechanism-index" aria-label="十種機制快速前往">
@@ -568,10 +599,10 @@
                 <h3>任務目標</h3>
                 <p>清楚的任務讓學生知道要完成什麼，也能把抽象學習目標轉成看得見的行動。</p>
                 <p class="classroom-link"><strong>課堂連結</strong> 把題目設計成收集物，完成指定題數才能抵達終點。</p>
-                <p>返家任務分成五個航段，每關解開三道乘法題來取得座標。</p>
+                <p>用三道乘法題完成小任務，收集森林路標。</p>
               </div>
-              <div class="frame-heading"><span>任務目標　逐段蒐集返航座標</span><button class="fullscreen-button" type="button" data-fullscreen-for="game-mission">全螢幕</button></div>
-              <iframe class="game-embed" id="game-mission" title="任務目標機制的乘法星球遊戲" src="./index.html?embed=1&amp;mechanic=mission" loading="lazy" allow="fullscreen" allowfullscreen></iframe>
+              <div class="frame-heading"><span>任務目標　逐區蒐集森林路標</span><button class="fullscreen-button" type="button" data-fullscreen-for="game-mission">全螢幕</button></div>
+              <iframe class="game-embed" id="game-mission" title="任務目標機制的森林乘法短版示範" src="./mechanism-demo.html?embed=1&amp;mechanic=mission" loading="lazy" allow="fullscreen" allowfullscreen></iframe>
             </article>
           </div>
 
@@ -582,10 +613,10 @@
                 <h3>點數與獎勵</h3>
                 <p>獎勵能讓進展變得可見。分數也能記錄努力、策略或知識應用，不必只獎勵速度。</p>
                 <p class="classroom-link"><strong>課堂連結</strong> 答對得星星，說出解題理由再取得額外獎勵。</p>
-                <p>答對累積探險分數，連續答對三題再取得星塵徽章和額外獎勵。</p>
+                <p>答對累積探險分數，連續答對三題就能取得動物夥伴徽章和額外獎勵。</p>
               </div>
-              <div class="frame-heading"><span>點數與獎勵　累積分數與星塵徽章</span><button class="fullscreen-button" type="button" data-fullscreen-for="game-reward">全螢幕</button></div>
-              <iframe class="game-embed" id="game-reward" title="點數與獎勵機制的乘法星球遊戲" src="./index.html?embed=1&amp;mechanic=reward" loading="lazy" allow="fullscreen" allowfullscreen></iframe>
+              <div class="frame-heading"><span>點數與獎勵　累積分數與動物夥伴徽章</span><button class="fullscreen-button" type="button" data-fullscreen-for="game-reward">全螢幕</button></div>
+              <iframe class="game-embed" id="game-reward" title="點數與獎勵機制的森林乘法短版示範" src="./mechanism-demo.html?embed=1&amp;mechanic=reward" loading="lazy" allow="fullscreen" allowfullscreen></iframe>
             </article>
           </div>
 
@@ -599,7 +630,7 @@
                 <p>每次選擇後立即看到乘法拆解，知道正確答案如何算出來。</p>
               </div>
               <div class="frame-heading"><span>即時回饋　作答後顯示乘法解說</span><button class="fullscreen-button" type="button" data-fullscreen-for="game-feedback">全螢幕</button></div>
-              <iframe class="game-embed" id="game-feedback" title="即時回饋機制的乘法星球遊戲" src="./index.html?embed=1&amp;mechanic=feedback" loading="lazy" allow="fullscreen" allowfullscreen></iframe>
+              <iframe class="game-embed" id="game-feedback" title="即時回饋機制的森林乘法短版示範" src="./mechanism-demo.html?embed=1&amp;mechanic=feedback" loading="lazy" allow="fullscreen" allowfullscreen></iframe>
             </article>
           </div>
 
@@ -610,10 +641,10 @@
                 <h3>記憶提取</h3>
                 <p>翻牌配對要求學生回想先前看過的資訊，適合練習詞語、概念、符號與解釋之間的連結。</p>
                 <p class="classroom-link"><strong>課堂連結</strong> 配對算式與答案，或配對單字與圖片。</p>
-                <p>每解開一題就要回想剛才的乘法事實，再繼續新的航段。</p>
+                <p>每解開一題就要回想剛才的乘法事實，再和動物朋友深入森林。</p>
               </div>
               <div class="frame-heading"><span>記憶提取　作答後回想上一題</span><button class="fullscreen-button" type="button" data-fullscreen-for="game-memory">全螢幕</button></div>
-              <iframe class="game-embed" id="game-memory" title="記憶提取機制的乘法星球遊戲" src="./index.html?embed=1&amp;mechanic=memory" loading="lazy" allow="fullscreen" allowfullscreen></iframe>
+              <iframe class="game-embed" id="game-memory" title="記憶提取機制的森林乘法短版示範" src="./mechanism-demo.html?embed=1&amp;mechanic=memory" loading="lazy" allow="fullscreen" allowfullscreen></iframe>
             </article>
           </div>
 
@@ -624,10 +655,10 @@
                 <h3>限時挑戰</h3>
                 <p>倒數計時帶來節奏感，適合熟練練習。若目標是理解新概念，可放寬時間或提供不計時模式。</p>
                 <p class="classroom-link"><strong>課堂連結</strong> 以短倒數練習熟練度，結束後比較解題策略。</p>
-                <p>每題限時二十秒，時間內移動太空人蒐集正確答案。</p>
+                <p>三題限時挑戰，每題倒數十五秒，熟悉後再追求速度。</p>
               </div>
-              <div class="frame-heading"><span>限時挑戰　每題倒數二十秒</span><button class="fullscreen-button" type="button" data-fullscreen-for="game-timer">全螢幕</button></div>
-              <iframe class="game-embed" id="game-timer" title="限時挑戰機制的乘法星球遊戲" src="./index.html?embed=1&amp;mechanic=timer" loading="lazy" allow="fullscreen" allowfullscreen></iframe>
+              <div class="frame-heading"><span>限時挑戰　每題倒數十五秒</span><button class="fullscreen-button" type="button" data-fullscreen-for="game-timer">全螢幕</button></div>
+              <iframe class="game-embed" id="game-timer" title="限時挑戰機制的森林乘法短版示範" src="./mechanism-demo.html?embed=1&amp;mechanic=timer" loading="lazy" allow="fullscreen" allowfullscreen></iframe>
             </article>
           </div>
 
@@ -638,10 +669,10 @@
                 <h3>風險與選擇</h3>
                 <p>不同選擇帶來不同結果，學生要衡量線索與風險，再決定何時行動。</p>
                 <p class="classroom-link"><strong>課堂連結</strong> 從多個答案中選路，錯誤選項會增加挑戰但不阻斷學習。</p>
-                <p>每題先選安全航線或冒險航線，分別承擔不同的加分與扣分。</p>
+                <p>每題先選安全小徑或冒險捷徑，分別承擔不同的加分與扣分。</p>
               </div>
-              <div class="frame-heading"><span>風險與選擇　安全航線或高報酬航線</span><button class="fullscreen-button" type="button" data-fullscreen-for="game-choice">全螢幕</button></div>
-              <iframe class="game-embed" id="game-choice" title="風險與選擇機制的乘法星球遊戲" src="./index.html?embed=1&amp;mechanic=choice" loading="lazy" allow="fullscreen" allowfullscreen></iframe>
+              <div class="frame-heading"><span>風險與選擇　安全小徑或高報酬捷徑</span><button class="fullscreen-button" type="button" data-fullscreen-for="game-choice">全螢幕</button></div>
+              <iframe class="game-embed" id="game-choice" title="風險與選擇機制的森林乘法短版示範" src="./mechanism-demo.html?embed=1&amp;mechanic=choice" loading="lazy" allow="fullscreen" allowfullscreen></iframe>
             </article>
           </div>
 
@@ -655,7 +686,7 @@
                 <p>三格救援機會支撐再次嘗試，連續答對兩題可補回一格能量。</p>
               </div>
               <div class="frame-heading"><span>生命與再次嘗試　答對連勝補回能量</span><button class="fullscreen-button" type="button" data-fullscreen-for="game-lives">全螢幕</button></div>
-              <iframe class="game-embed" id="game-lives" title="生命與再次嘗試機制的乘法星球遊戲" src="./index.html?embed=1&amp;mechanic=lives" loading="lazy" allow="fullscreen" allowfullscreen></iframe>
+              <iframe class="game-embed" id="game-lives" title="生命與再次嘗試機制的森林乘法短版示範" src="./mechanism-demo.html?embed=1&amp;mechanic=lives" loading="lazy" allow="fullscreen" allowfullscreen></iframe>
             </article>
           </div>
 
@@ -666,10 +697,10 @@
                 <h3>空間規劃</h3>
                 <p>學生預想移動順序與後續位置，練習空間推理、步驟規劃與策略修正。</p>
                 <p class="classroom-link"><strong>課堂連結</strong> 把概念卡片排成正確順序，移動前先預測結果。</p>
-                <p>太空人會留在上一題的抵達位置，學生要規劃下一條安全路徑。</p>
+                <p>探險家會留在上一題的抵達位置，學生要規劃下一條安全小徑。</p>
               </div>
-              <div class="frame-heading"><span>空間規劃　連續規劃太空人行進路徑</span><button class="fullscreen-button" type="button" data-fullscreen-for="game-planning">全螢幕</button></div>
-              <iframe class="game-embed" id="game-planning" title="空間規劃機制的乘法星球遊戲" src="./index.html?embed=1&amp;mechanic=planning" loading="lazy" allow="fullscreen" allowfullscreen></iframe>
+              <div class="frame-heading"><span>空間規劃　連續規劃森林行進路徑</span><button class="fullscreen-button" type="button" data-fullscreen-for="game-planning">全螢幕</button></div>
+              <iframe class="game-embed" id="game-planning" title="空間規劃機制的森林乘法短版示範" src="./mechanism-demo.html?embed=1&amp;mechanic=planning" loading="lazy" allow="fullscreen" allowfullscreen></iframe>
             </article>
           </div>
 
@@ -680,10 +711,10 @@
                 <h3>線索推理</h3>
                 <p>學生從已知線索推導未知答案，練習解讀資訊、排除選項與說明理由。</p>
                 <p class="classroom-link"><strong>課堂連結</strong> 用數字線索推理地雷位置，並說明每一步判斷。</p>
-                <p>先用分解乘法的提示推理答案，再移動角色收集對應星球。</p>
+                <p>先用分解乘法的提示推理答案，再移動角色找到動物朋友。</p>
               </div>
               <div class="frame-heading"><span>線索推理　根據乘法分解提示作答</span><button class="fullscreen-button" type="button" data-fullscreen-for="game-clue">全螢幕</button></div>
-              <iframe class="game-embed" id="game-clue" title="線索推理機制的乘法星球遊戲" src="./index.html?embed=1&amp;mechanic=clue" loading="lazy" allow="fullscreen" allowfullscreen></iframe>
+              <iframe class="game-embed" id="game-clue" title="線索推理機制的森林乘法短版示範" src="./mechanism-demo.html?embed=1&amp;mechanic=clue" loading="lazy" allow="fullscreen" allowfullscreen></iframe>
             </article>
           </div>
 
@@ -694,10 +725,10 @@
                 <h3>漸進難度</h3>
                 <p>逐步提高速度或任務複雜度，讓學生先熟悉規則，再進入更高挑戰。</p>
                 <p class="classroom-link"><strong>課堂連結</strong> 先熟悉 2、5、10 倍，再逐關挑戰 3 到 12 倍，讓難度跟著乘法能力增加。</p>
-                <p>五個關卡從熟悉的倍數開始，逐步挑戰更大的乘數與更複雜的航段。</p>
+                <p>只用三題展示難度遞增：從 2 × 3 開始，逐步挑戰 7 × 8。</p>
               </div>
-              <div class="frame-heading"><span>漸進難度　由基礎倍數逐關返家</span><button class="fullscreen-button" type="button" data-fullscreen-for="game-progression">全螢幕</button></div>
-              <iframe class="game-embed" id="game-progression" title="漸進難度機制的乘法星球遊戲" src="./index.html?embed=1&amp;mechanic=progression" loading="lazy" allow="fullscreen" allowfullscreen></iframe>
+              <div class="frame-heading"><span>漸進難度　從熟悉倍數走向森林出口</span><button class="fullscreen-button" type="button" data-fullscreen-for="game-progression">全螢幕</button></div>
+              <iframe class="game-embed" id="game-progression" title="漸進難度機制的森林乘法短版示範" src="./mechanism-demo.html?embed=1&amp;mechanic=progression" loading="lazy" allow="fullscreen" allowfullscreen></iframe>
             </article>
           </div>
         </div>
@@ -713,7 +744,7 @@
           <p class="mb-2">本頁對遊戲式學習的說明參考教育研究中對學習目標、遊戲內容、問題解決與挑戰的整理。</p>
           <p class="mb-2"><a href="https://www.sciencedirect.com/science/article/pii/S0747563216303491" target="_blank" rel="noreferrer">Game Based Learning and 21st Century Skills 研究回顧</a></p>
           <p class="mb-2"><a href="https://github.com/phaserjs/examples/tree/master/public/src/games" target="_blank" rel="noreferrer">Phaser 官方遊戲範例目錄</a> · <a href="https://labs.phaser.io/phaser4-index.html?path=games" target="_blank" rel="noreferrer">Phaser Labs 線上範例</a></p>
-          <p class="mb-0">十款乘法返家遊戲以 Phaser 製作，各自實作不同遊戲機制。載入 Phaser 與 Bootstrap 需要網路連線。</p>
+          <p class="mb-0">十個短版互動示範以 Phaser 製作，各自呈現一種遊戲機制。完整作品可從機制頁上方按鈕前往。載入 Phaser 與 Bootstrap 需要網路連線。</p>
         </div>
       </div>
     </section>

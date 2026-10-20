@@ -1,0 +1,971 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#315239">
+  <title>森林乘法探險｜動物朋友的返家任務</title>
+  <script src="https://cdn.jsdelivr.net/npm/phaser@3.88.2/dist/phaser.min.js"></script>
+  <style>
+    :root {
+      color-scheme: light;
+      --navy: #294936;
+      --ink: #294936;
+      --muted: #71816d;
+      --teal: #477d4c;
+      --mint: #e4f0d9;
+      --coral: #df8052;
+      --paper: #fffdf7;
+    }
+    * { box-sizing: border-box; }
+    body {
+      min-height: 100vh;
+      margin: 0;
+      padding: 30px 18px 42px;
+      color: var(--ink);
+      background:
+        radial-gradient(ellipse at 12% 6%, #709b5b 0, transparent 27rem),
+        radial-gradient(ellipse at 90% 88%, #426c48 0, transparent 32rem),
+        var(--navy);
+      font-family: "Noto Sans TC", "Microsoft JhengHei", system-ui, sans-serif;
+    }
+    button { font: inherit; }
+    .shell { width: min(100%, 1020px); margin: 0 auto; }
+    .masthead { display: flex; align-items: center; gap: 14px; margin: 0 0 17px 4px; color: white; }
+    .brand-icon {
+      display: grid; width: 48px; height: 48px; flex: 0 0 auto; place-items: center;
+      border: 1px solid #ffffff35; border-radius: 16px; background: #ffffff17; font-size: 25px;
+    }
+    .masthead h1 { margin: 0; font-size: clamp(20px, 3.5vw, 29px); letter-spacing: .04em; }
+    .masthead p { margin: 3px 0 0; color: #bed5df; font-size: 13px; }
+    .badge { margin-left: auto; padding: 8px 13px; border: 1px solid #ffffff35; border-radius: 999px; color: #e9fcf3; background: #ffffff12; font-size: 13px; white-space: nowrap; }
+    .game-card { overflow: hidden; border: 1px solid #d9e8e4; border-radius: 24px; background: var(--paper); box-shadow: 0 22px 70px #071a2b66; }
+    .dashboard { display: grid; grid-template-columns: 1fr auto; gap: 16px 24px; padding: 20px 24px 17px; }
+    .question-block { align-self: center; }
+    .eyebrow { margin: 0 0 4px; color: var(--muted); font-size: 12px; font-weight: 800; letter-spacing: .11em; }
+    .stage-goal { margin: 4px 0 0; color: var(--muted); font-size: 12px; font-weight: 700; }
+    .question { margin: 0; color: var(--ink); font-size: clamp(24px, 4vw, 34px); font-weight: 900; letter-spacing: .035em; }
+    .question .equals { color: var(--teal); }
+    .question .unknown { display: inline-grid; min-width: 42px; place-items: center; color: #ea684f; }
+    .stats { display: flex; gap: 9px; align-items: center; }
+    .stat { min-width: 94px; padding: 9px 13px; border-radius: 14px; background: #f0f6f3; text-align: center; }
+    .stat span { display: block; color: var(--muted); font-size: 11px; font-weight: 700; }
+    .stat strong { display: block; margin-top: 1px; color: var(--ink); font-size: 19px; font-variant-numeric: tabular-nums; }
+    .stat.score { background: #fff0dc; }
+    .stat.score strong { color: #a35817; }
+    .stat.rescue { background: #fce9eb; }
+    .stat.rescue strong { color: #ae4755; }
+    .progress-row { grid-column: 1 / -1; display: flex; align-items: center; gap: 12px; }
+    .progress-label { flex: 0 0 auto; color: var(--muted); font-size: 12px; font-weight: 700; }
+    .progress-track { height: 8px; flex: 1; overflow: hidden; border-radius: 99px; background: #e6eeea; }
+    .progress-fill { width: 0; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #4bb899, #f1bd54); transition: width .35s ease; }
+    .board-wrap { position: relative; padding: 0 18px; background: var(--paper); }
+    #game { width: 100%; overflow: hidden; border: 1px solid #cfe3dc; border-radius: 19px; background: #dff5ec; }
+    #game canvas { display: block; width: 100% !important; height: auto !important; border-radius: 18px; touch-action: none; cursor: crosshair; }
+    .feedback {
+      position: absolute; z-index: 2; top: 8px; left: 50%; max-width: calc(100% - 38px);
+      padding: 7px 14px; transform: translate(-50%, -5px); border: 1px solid #ffffff;
+      border-radius: 999px; color: var(--ink); background: #fffdf0ed; box-shadow: 0 3px 12px #31584d24;
+      font-size: clamp(12px, 1.7vw, 15px); font-weight: 800; line-height: 1.3; text-align: center;
+      opacity: 0; pointer-events: none; transition: opacity .16s ease, transform .16s ease;
+    }
+    .feedback.visible { transform: translate(-50%, 0); opacity: 1; }
+    .result-overlay { position: absolute; inset: 0 18px; display: grid; place-items: center; border-radius: 19px; background: #102945c9; backdrop-filter: blur(4px); }
+    .result-overlay[hidden] { display: none; }
+    .result-box { width: min(88%, 410px); padding: 25px; border: 1px solid #ffffffa8; border-radius: 23px; background: #fffdf7; text-align: center; box-shadow: 0 15px 50px #071a2b55; }
+    .result-box .trophy { font-size: 42px; }
+    .result-box h2 { margin: 5px 0 7px; font-size: 26px; }
+    .result-box p { margin: 0 0 18px; color: var(--muted); }
+    .restart { border: 0; border-radius: 13px; padding: 12px 21px; color: white; background: var(--teal); font-weight: 800; cursor: pointer; box-shadow: 0 4px 0 #0e5d59; }
+    .restart:hover { background: #116e69; }
+    .restart:focus-visible { outline: 3px solid #ffbd4a; outline-offset: 3px; }
+    .below { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 16px 24px 20px; }
+    .hint { display: flex; align-items: flex-start; gap: 11px; color: var(--muted); font-size: 13px; line-height: 1.65; }
+    .hint-icon { display: grid; width: 31px; height: 31px; flex: 0 0 auto; place-items: center; border-radius: 10px; color: var(--teal); background: #e4f3ee; font-size: 15px; }
+    .hint strong { color: var(--ink); }
+    .fallback { padding: 25px; color: #883c20; text-align: center; }
+    @media (max-width: 620px) {
+      body { padding: 18px 10px 25px; }
+      .masthead { gap: 10px; margin-left: 2px; }
+      .brand-icon { width: 42px; height: 42px; border-radius: 13px; }
+      .masthead p { font-size: 11px; }
+      .badge { padding: 7px 9px; font-size: 11px; }
+      .dashboard { grid-template-columns: 1fr; gap: 11px; padding: 17px 16px 13px; }
+      .question-block { display: grid; grid-template-columns: 1fr auto; align-items: baseline; gap: 2px 8px; }
+      .eyebrow { grid-column: 1; grid-row: 1; }
+      .eyebrow { margin: 0; font-size: 10px; }
+      .question { grid-column: 1 / -1; grid-row: 2; }
+      .stage-goal { grid-column: 1 / -1; grid-row: 3; font-size: 10px; }
+      .question { font-size: clamp(23px, 7vw, 31px); }
+      .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+      .stat { min-width: 0; padding: 7px 6px; }
+      .stat strong { font-size: 17px; }
+      .progress-row { gap: 8px; }
+      .board-wrap { padding: 0 9px; }
+      .result-overlay { inset: 0 9px; }
+      #game, #game canvas { border-radius: 13px; }
+      .below { align-items: center; gap: 8px; padding: 12px 14px 15px; }
+      .hint { gap: 8px; font-size: 11px; }
+      .hint-icon { width: 27px; height: 27px; }
+    }
+    .mechanic-stat, .mechanic-note, .route-controls { display: none; }
+    .mechanic-note {
+      grid-column: 1 / -1;
+      margin: -7px 0 0;
+      padding: 7px 10px;
+      border-radius: 10px;
+      color: #50656b;
+      background: #edf6f1;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .route-controls {
+      grid-column: 1 / -1;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 4px 0 0;
+    }
+    .route-controls span { color: var(--muted); font-size: 12px; font-weight: 800; }
+    .route-choice {
+      border: 1px solid #c5d8ce;
+      border-radius: 999px;
+      padding: 6px 11px;
+      color: var(--ink);
+      background: white;
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    .route-choice[aria-pressed="true"] { border-color: var(--teal); color: white; background: var(--teal); }
+    body[data-mechanic="reward"] .mechanic-stat[data-stat="reward"],
+    body[data-mechanic="lives"] .mechanic-stat[data-stat="lives"],
+    body[data-mechanic="timer"] .mechanic-stat[data-stat="timer"] { display: block; }
+    body[data-mechanic="choice"] .route-controls { display: flex; }
+    body[data-mechanic="mission"] .mechanic-note,
+    body[data-mechanic="clue"] .mechanic-note,
+    body[data-mechanic="memory"] .mechanic-note,
+    body[data-mechanic="planning"] .mechanic-note,
+    body[data-mechanic="progression"] .mechanic-note { display: block; }
+    body.embed-mode {
+      width: 100vw;
+      height: 100vh;
+      min-height: 0;
+      overflow: hidden;
+      padding: 0;
+      background: var(--paper);
+    }
+    body.embed-mode .shell { width: 100%; height: 100%; margin: 0; }
+    body.embed-mode .masthead,
+    body.embed-mode .below { display: none; }
+    body.embed-mode .game-card {
+      display: flex;
+      width: 100%;
+      height: 100%;
+      flex-direction: column;
+      border: 0;
+      border-radius: 0;
+      box-shadow: none;
+    }
+    body.embed-mode .dashboard {
+      grid-template-columns: minmax(112px, 1fr) auto;
+      flex: 0 0 auto;
+      gap: 3px 7px;
+      padding: 7px 9px 5px;
+    }
+    body.embed-mode .eyebrow { margin: 0; font-size: 9px; letter-spacing: .04em; }
+    body.embed-mode .question { font-size: clamp(18px, 4.6vw, 25px); }
+    body.embed-mode .stage-goal { display: none; }
+    body.embed-mode .stats { display: flex; gap: 4px; }
+    body.embed-mode .stat { min-width: 49px; padding: 4px 5px; border-radius: 8px; }
+    body.embed-mode .stat span { font-size: 8px; }
+    body.embed-mode .stat strong { font-size: 13px; }
+    body.embed-mode .progress-row { gap: 6px; }
+    body.embed-mode .progress-label { font-size: 9px; }
+    body.embed-mode .progress-track { height: 5px; }
+    body.embed-mode .mechanic-note { margin: 0; padding: 4px 7px; font-size: 10px; line-height: 1.3; }
+    body.embed-mode .route-controls { gap: 5px; padding: 2px 0 0; }
+    body.embed-mode .route-controls span { font-size: 9px; }
+    body.embed-mode .route-choice { padding: 4px 8px; font-size: 10px; }
+    body.embed-mode .board-wrap {
+      display: grid;
+      min-height: 0;
+      flex: 1 1 auto;
+      place-items: center;
+      padding: 0 7px 7px;
+    }
+    body.embed-mode #game {
+      display: grid;
+      width: 100%;
+      height: 100%;
+      min-height: 0;
+      place-items: center;
+      border: 0;
+      border-radius: 0;
+    }
+    body.embed-mode #game canvas {
+      width: auto !important;
+      height: 100% !important;
+      max-width: 100%;
+      max-height: 100%;
+      border-radius: 10px;
+    }
+    body.embed-mode .feedback { top: 4px; max-width: calc(100% - 12px); padding: 4px 9px; font-size: 10px; }
+    body.embed-mode .result-overlay { inset: 0 7px 7px; border-radius: 10px; }
+    body.embed-mode .result-box { width: min(90%, 360px); padding: 12px 14px; border-radius: 15px; }
+    body.embed-mode .result-box .trophy { font-size: 27px; }
+    body.embed-mode .result-box h2 { margin: 2px 0 4px; font-size: 18px; }
+    body.embed-mode .result-box p { margin-bottom: 9px; font-size: 11px; line-height: 1.4; }
+    body.embed-mode .restart { padding: 7px 13px; border-radius: 10px; font-size: 12px; }
+    @media (max-width: 450px) {
+      body.embed-mode .dashboard { grid-template-columns: 1fr; }
+      body.embed-mode .stats { grid-row: 2; justify-content: space-between; }
+      body.embed-mode .progress-row { grid-row: 3; }
+    }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; } }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header class="masthead">
+      <div class="brand-icon" aria-hidden="true">🧭</div>
+      <div>
+        <h1>森林乘法探險</h1>
+        <p>探險家在森林迷路了，和動物朋友一起找回家的路！</p>
+      </div>
+      <div class="badge">✦ 5 關冒險</div>
+    </header>
+
+    <section class="game-card" aria-label="森林乘法探險遊戲">
+      <div class="dashboard">
+        <div class="question-block" aria-live="polite">
+          <p class="eyebrow" id="question-label">第 1 關・第 1 題</p>
+          <p class="question" id="question">2 × 3 <span class="equals">=</span> <span class="unknown">?</span></p>
+          <p class="stage-goal" id="stage-goal">本關任務：用 2、5、10 的倍數計算補給</p>
+        </div>
+        <div class="stats" aria-label="遊戲進度">
+          <div class="stat"><span>關卡</span><strong id="stage-stat">1 / 5</strong></div>
+          <div class="stat"><span>本關題數</span><strong id="round-stat">1 / 3</strong></div>
+          <div class="stat score"><span>探險分數</span><strong id="score-stat">0</strong></div>
+          <div class="stat rescue"><span>救援機會</span><strong id="life-stat">3</strong></div>
+          <div class="stat mechanic-stat" data-stat="timer"><span>剩餘時間</span><strong id="timer-stat">20</strong></div>
+          <div class="stat mechanic-stat" data-stat="reward"><span>動物夥伴徽章</span><strong id="reward-stat">0</strong></div>
+          <div class="stat mechanic-stat" data-stat="lives"><span>連勝補給</span><strong id="lives-streak-stat">0 / 2</strong></div>
+        </div>
+        <p class="mechanic-note" id="mechanic-note" aria-live="polite"></p>
+        <div class="route-controls" id="route-controls" aria-label="選擇森林路線風險">
+          <span>選擇森林路線</span>
+          <button class="route-choice" type="button" data-route="safe" aria-pressed="false">安全小徑　答對 +10</button>
+          <button class="route-choice" type="button" data-route="risky" aria-pressed="false">冒險捷徑　答對 +20</button>
+        </div>
+        <div class="progress-row" aria-label="總進度">
+          <span class="progress-label" id="progress-label">森林探索 0 / 15 題</span>
+          <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+        </div>
+      </div>
+
+      <div class="board-wrap">
+        <div class="feedback" id="feedback" role="status" aria-live="polite"></div>
+        <div id="game" aria-label="使用滑鼠點選答案目標，森林探險家會自動移動過去作答"></div>
+        <div class="result-overlay" id="result-overlay" hidden>
+          <div class="result-box">
+            <div class="trophy" id="result-icon" aria-hidden="true">🏆</div>
+            <h2 id="result-title">森林任務完成！</h2>
+            <p id="final-score">你完成了 5 個關卡！</p>
+            <button class="restart" id="restart-button" type="button">再玩一次</button>
+          </div>
+        </div>
+      </div>
+
+      <footer class="below">
+        <div class="hint">
+          <div class="hint-icon" aria-hidden="true">✦</div>
+          <div><strong>點選動物答案，探險家會自動前往</strong><br>也能點擊空白處移動。答對 +10 分，答錯 −5 分並消耗一次救援機會，答錯三次會在森林裡迷路，再重新出發就能繼續探險。</div>
+        </div>
+      </footer>
+    </section>
+  </main>
+
+  <script>
+    (() => {
+      const stages = [
+        { name: '林間入口', worldTitle: '林間入口・松鼠的橡果地圖', background: 0xeaf2d9, foreground: '#496d43', optionArt: ['squirrel', 'rabbit', 'deer'], goal: '用 2、5、10 的乘法找出橡果、胡蘿蔔和花朵的數量', checkpoint: '松鼠分享橡果地圖，兔子和小鹿指向溪谷。', questions: [{ a: 2, b: 3 }, { a: 5, b: 4 }, { a: 10, b: 3 }] },
+        { name: '清澈溪谷', worldTitle: '清澈溪谷・青蛙、鴨子與烏龜', background: 0xd8eff0, foreground: '#38716c', optionArt: ['frog', 'duck', 'turtle'], goal: '用 3、4 的乘法幫溪邊動物數清睡蓮、魚群和石頭', checkpoint: '青蛙、鴨子和烏龜一起指出通往竹林的木橋。', questions: [{ a: 3, b: 6 }, { a: 4, b: 7 }, { a: 3, b: 8 }] },
+        { name: '竹林小徑', worldTitle: '竹林小徑・猴子、熊貓與狐狸', background: 0xe0eed4, foreground: '#4b7044', optionArt: ['monkey', 'panda', 'fox'], goal: '熟練 6、7 的乘法，幫動物朋友找到正確的竹林路標', checkpoint: '猴子搖下竹葉路標，熊貓和狐狸帶你找到洞穴入口。', questions: [{ a: 6, b: 7 }, { a: 7, b: 8 }, { a: 6, b: 9 }] },
+        { name: '螢火洞穴', worldTitle: '螢火洞穴・貓頭鷹、黑熊與灰狼', background: 0xe8dfca, foreground: '#715b3e', optionArt: ['owl', 'bear', 'wolf'], goal: '用 8、9 的乘法辨認洞穴裡的螢火蟲記號，找到出口方向', checkpoint: '貓頭鷹照亮石壁，黑熊和灰狼發現了古樹留下的線索。', questions: [{ a: 8, b: 8 }, { a: 9, b: 6 }, { a: 9, b: 7 }] },
+        { name: '古樹祕境', worldTitle: '古樹祕境・螢火蟲與白鹿', background: 0xdcebd4, foreground: '#416b46', optionArt: ['firefly', 'whiteDeer', 'forestGuardian'], goal: '運用 11、12 的乘法讀懂古樹線索，找到森林出口', checkpoint: '螢火蟲照亮最後一塊路牌，白鹿帶探險家走出森林。', questions: [{ a: 11, b: 8 }, { a: 12, b: 7 }, { a: 12, b: 9 }] }
+      ];
+      const query = new URLSearchParams(location.search);
+      const allowedMechanics = ['mission', 'reward', 'feedback', 'memory', 'timer', 'choice', 'lives', 'planning', 'clue', 'progression'];
+      const requestedMechanic = query.get('mechanic') || 'progression';
+      const mechanic = allowedMechanics.includes(requestedMechanic) ? requestedMechanic : 'progression';
+      const embedMode = query.get('embed') === '1';
+      document.body.dataset.mechanic = mechanic;
+      if (embedMode) document.body.classList.add('embed-mode');
+      const totalQuestions = stages.reduce((sum, stage) => sum + stage.questions.length, 0);
+      const ui = {
+        question: document.getElementById('question'),
+        questionLabel: document.getElementById('question-label'),
+        stageGoal: document.getElementById('stage-goal'),
+        stage: document.getElementById('stage-stat'),
+        round: document.getElementById('round-stat'),
+        score: document.getElementById('score-stat'),
+        lives: document.getElementById('life-stat'),
+        progressLabel: document.getElementById('progress-label'),
+        progressFill: document.getElementById('progress-fill'),
+        overlay: document.getElementById('result-overlay'),
+        resultIcon: document.getElementById('result-icon'),
+        resultTitle: document.getElementById('result-title'),
+        finalScore: document.getElementById('final-score'),
+        restart: document.getElementById('restart-button'),
+        feedback: document.getElementById('feedback'),
+        mechanicNote: document.getElementById('mechanic-note'),
+        timerStat: document.getElementById('timer-stat'),
+        rewardStat: document.getElementById('reward-stat'),
+        livesStreakStat: document.getElementById('lives-streak-stat'),
+        routeButtons: [...document.querySelectorAll('.route-choice')]
+      };
+
+      if (!window.Phaser) {
+        document.getElementById('game').innerHTML = '<div class="fallback">遊戲引擎載入失敗，請確認網路連線後重新整理頁面。</div>';
+        return;
+      }
+
+      class StarIsland extends Phaser.Scene {
+        constructor() {
+          super('StarIsland');
+          this.stageIndex = 0;
+          this.questionIndex = 0;
+          this.score = 0;
+          this.lives = 3;
+          this.solved = 0;
+          this.acceptingAnswer = true;
+          this.awaitingStart = true;
+          this.awaitingStage = false;
+          this.moveTarget = null;
+          this.targets = [];
+          this.labels = [];
+          this.feedbackTimer = null;
+          this.correctStreak = 0;
+          this.recallQuestion = null;
+          this.isRecallRound = false;
+          this.playerHasMoved = false;
+          this.questionTime = 20;
+          this.questionTimer = null;
+          this.selectedRoute = null;
+          this.timerRunning = false;
+        }
+
+        create() {
+          this.makeTextures();
+          this.drawStageWorld();
+          this.physics.world.setBounds(42, 38, 876, 364);
+          this.player = this.physics.add.sprite(480, 365, 'explorer');
+          this.player.setCollideWorldBounds(true);
+          this.player.body.setSize(40, 48).setOffset(16, 22);
+          this.orbs = this.physics.add.group({ allowGravity: false, immovable: true });
+          this.physics.add.overlap(this.player, this.orbs, this.collectAnswer, undefined, this);
+          this.input.on('pointerdown', (pointer) => {
+            if (!this.acceptingAnswer) return;
+            this.playerHasMoved = true;
+            this.moveTarget = {
+              x: Phaser.Math.Clamp(pointer.worldX, 42, 918),
+              y: Phaser.Math.Clamp(pointer.worldY, 38, 402)
+            };
+          });
+          this.spawnQuestion({ gracePeriod: true });
+          this.showIntro();
+        }
+
+        drawStageWorld() {
+          const stage = stages[this.stageIndex];
+          const g = this.worldGraphics || this.add.graphics().setDepth(0);
+          this.worldGraphics = g;
+          g.clear();
+          g.fillStyle(stage.background, 1).fillRoundedRect(18, 17, 924, 406, 25);
+          g.lineStyle(2, 0xffffff, .78).strokeRoundedRect(18, 17, 924, 406, 25);
+          this.cameras.main.setBackgroundColor(stage.background);
+
+          const tree = (x, y, scale, leaves = 0x67945b) => {
+            g.fillStyle(0x76583d, .9).fillRoundedRect(x - 9 * scale, y + 8 * scale, 18 * scale, 78 * scale, 7 * scale);
+            g.fillStyle(leaves, .96).fillCircle(x, y, 34 * scale).fillCircle(x - 24 * scale, y + 18 * scale, 25 * scale).fillCircle(x + 25 * scale, y + 19 * scale, 26 * scale);
+            g.fillStyle(0xa7c979, .75).fillCircle(x - 11 * scale, y - 9 * scale, 8 * scale).fillCircle(x + 19 * scale, y + 10 * scale, 7 * scale);
+          };
+          const bush = (x, y, color = 0x78a967) => {
+            g.fillStyle(color, .9).fillEllipse(x, y, 78, 37).fillCircle(x - 22, y - 8, 19).fillCircle(x + 10, y - 13, 22).fillCircle(x + 30, y - 4, 17);
+          };
+
+          if (this.stageIndex === 0) {
+            g.fillStyle(0xd6e5b7, 1).fillEllipse(480, 340, 620, 160);
+            g.lineStyle(42, 0xc7a875, 1).beginPath().moveTo(470, 421).lineTo(505, 343).lineTo(447, 275).lineTo(489, 205).lineTo(458, 143).strokePath();
+            g.lineStyle(4, 0xe8d2a9, .9).beginPath().moveTo(470, 421).lineTo(505, 343).lineTo(447, 275).lineTo(489, 205).lineTo(458, 143).strokePath();
+            tree(92, 83, 1.1); tree(858, 86, 1.04, 0x54854d); tree(98, 322, .78, 0x77a96b); tree(860, 325, .82, 0x6a995b);
+            bush(190, 368); bush(770, 365, 0x86af6d);
+            [[180,120],[786,116],[135,247],[825,245],[247,338],[714,328]].forEach(([x,y], i) => g.fillStyle(i % 2 ? 0xe1a04f : 0xf1cf68, .9).fillCircle(x,y,5));
+          } else if (this.stageIndex === 1) {
+            g.fillStyle(0x8dc9c0, .9).fillPoints([[18,212],[224,190],[365,221],[520,201],[705,225],[942,187],[942,332],[718,315],[538,341],[355,307],[178,336],[18,312]].map(([x,y]) => new Phaser.Geom.Point(x,y)), true);
+            g.lineStyle(8, 0xc7ece4, .85).beginPath().moveTo(30, 245).lineTo(190, 229).lineTo(335, 254).lineTo(470, 235).lineTo(648, 269).lineTo(920, 226).strokePath();
+            g.lineStyle(5, 0xf2d6a0, .95).beginPath().moveTo(356, 205).lineTo(390, 195).lineTo(421, 194).lineTo(454, 201).strokePath();
+            g.fillStyle(0x8b6546, 1).fillRoundedRect(383, 186, 9, 33, 3).fillRoundedRect(426, 186, 9, 33, 3);
+            tree(96, 78, .84); tree(864, 80, .87, 0x55864c); bush(80, 351, 0x6c9b5c); bush(872, 352, 0x6c9b5c);
+            [[185,273],[760,286],[267,300],[669,300]].forEach(([x,y],i) => { g.fillStyle(i % 2 ? 0x84b8a7 : 0x9eaa91, 1).fillEllipse(x,y,35,19); g.fillStyle(0xeff7cf, .8).fillCircle(x-5,y-4,3); });
+            [[270,246],[700,248]].forEach(([x,y]) => { g.fillStyle(0x5b9b70, 1).fillEllipse(x,y,30,12); g.fillStyle(0xe6c36b, 1).fillCircle(x+6,y-4,4); });
+          } else if (this.stageIndex === 2) {
+            [70,145,815,890].forEach((x,i) => {
+              const h = i % 2 ? 190 : 240;
+              g.fillStyle(i % 2 ? 0x5d9a56 : 0x74a965, .9).fillRoundedRect(x-9, 37, 18, h, 8);
+              g.fillStyle(0xb0c878, .95).fillRoundedRect(x-5, 37, 4, h, 2);
+              for (let y=77;y<h+25;y+=46) g.lineStyle(3, 0x40794a, .85).beginPath().moveTo(x-9,y).lineTo(x+9,y).strokePath();
+              g.lineStyle(5, 0x5b8e50, .9).beginPath().moveTo(x,y+28).lineTo(x-31,y+9).moveTo(x,y+55).lineTo(x+31,y+37).strokePath();
+              g.fillStyle(0x79a85e, .8).fillEllipse(x-31,84,37,12).fillEllipse(x+31,112,39,13);
+            });
+            g.fillStyle(0xbed89b, .45).fillEllipse(480, 372, 690, 70);
+            bush(248,367,0x779c55); bush(708,365,0x789f58);
+          } else if (this.stageIndex === 3) {
+            g.fillStyle(0x665744, 1).fillPoints([[18,17],[942,17],[942,111],[873,126],[820,101],[773,130],[716,112],[664,144],[614,113],[548,138],[488,109],[430,142],[374,113],[322,144],[264,112],[206,138],[152,109],[92,133],[18,108]].map(([x,y]) => new Phaser.Geom.Point(x,y)), true);
+            g.fillStyle(0x514b3f, .95).fillRoundedRect(232, 19, 496, 94, 42);
+            g.fillStyle(0xe4b951, .95).fillCircle(102,147,7).fillCircle(850,168,6).fillCircle(802,295,5).fillCircle(137,285,5).fillCircle(708,99,4).fillCircle(270,133,4);
+            g.lineStyle(3, 0xf3d77d, .42).beginPath().moveTo(110,175).lineTo(158,192).lineTo(203,169).moveTo(797,194).lineTo(847,213).lineTo(882,194).strokePath();
+            tree(82,323,.8,0x557c4b); tree(879,322,.8,0x557c4b);
+            g.fillStyle(0x9e8969, .85).fillEllipse(480,407,680,55);
+          } else {
+            g.fillStyle(0x719258, .22).fillEllipse(480, 158, 640, 245);
+            g.fillStyle(0x5d824d, .26).fillEllipse(480, 157, 500, 193);
+            g.lineStyle(17, 0x785c3d, .72).strokeEllipse(480, 169, 385, 246);
+            g.lineStyle(8, 0xa47c4a, .72).strokeEllipse(480, 169, 310, 187);
+            g.lineStyle(4, 0xdbc17a, .64).strokeEllipse(480, 169, 240, 135);
+            tree(94,82,.93,0x4c7c47); tree(865,82,.92,0x4c7c47);
+            g.fillStyle(0xf4dc82, .9).fillCircle(140,165,5).fillCircle(813,146,4).fillCircle(214,333,4).fillCircle(750,337,5).fillCircle(626,89,3).fillCircle(365,82,4);
+            [[300,278],[659,280],[190,221],[772,221]].forEach(([x,y],i) => g.fillStyle(i % 2 ? 0x8eb566 : 0x9dbd6f,.7).fillEllipse(x,y,48,19));
+          }
+
+          if (!this.worldTitle) {
+            this.worldTitle = this.add.text(38, 27, '', {
+              fontFamily: 'system-ui, sans-serif', fontSize: '12px', fontStyle: 'bold'
+            }).setDepth(3);
+          }
+          this.worldTitle.setText(`❧ ${stage.worldTitle}`).setColor(stage.foreground);
+        }
+        showIntro() {
+          this.acceptingAnswer = false;
+          if (this.feedbackTimer) this.feedbackTimer.remove();
+          this.feedbackTimer = null;
+          ui.feedback.classList.remove('visible');
+          ui.resultIcon.textContent = '🧭';
+          ui.resultTitle.textContent = '探險家在森林迷路了！';
+          ui.finalScore.textContent = '探險家迷失在森林裡，松鼠、青蛙、熊貓和白鹿會一路提供線索。解開五關乘法任務、蒐集森林路標，就能找到出口平安回家。答對 +10 分，答錯 −5 分並消耗一次救援機會。';
+          ui.restart.textContent = '開始森林探險';
+          ui.overlay.hidden = false;
+        }
+
+        startGame() {
+          if (!this.awaitingStart) return;
+          this.awaitingStart = false;
+          this.acceptingAnswer = true;
+          ui.overlay.hidden = true;
+          this.addToast('森林探險開始！先找附近的動物朋友。', '#477d4c', 1200);
+          this.startQuestionTimer();
+        }
+
+        makeTextures() {
+          const hero = this.make.graphics({ x: 0, y: 0, add: false });
+          hero.fillStyle(0x294936, .18).fillEllipse(36, 78, 39, 10);
+          hero.fillStyle(0x916b45, 1).fillRoundedRect(49, 42, 13, 29, 5);
+          hero.fillStyle(0x725638, 1).fillRoundedRect(52, 47, 8, 18, 3);
+          hero.fillStyle(0x547a49, 1).fillRoundedRect(21, 58, 30, 20, 8);
+          hero.lineStyle(2, 0x355d3b, 1).strokeRoundedRect(21, 58, 30, 20, 8);
+          hero.fillStyle(0xb47a49, 1).fillRoundedRect(22, 72, 13, 9, 4).fillRoundedRect(38, 72, 13, 9, 4);
+          hero.fillStyle(0xe4b879, 1).fillRoundedRect(12, 43, 13, 24, 6).fillRoundedRect(47, 43, 13, 24, 6);
+          hero.fillStyle(0x698a52, 1).fillRoundedRect(22, 40, 29, 31, 10);
+          hero.lineStyle(2, 0x355d3b, 1).strokeRoundedRect(22, 40, 29, 31, 10);
+          hero.fillStyle(0xd8a261, 1).fillCircle(36, 29, 19);
+          hero.fillStyle(0x385b39, 1).fillEllipse(36, 15, 48, 12).fillRoundedRect(23, 12, 26, 9, 4);
+          hero.fillStyle(0x1f392c, 1).fillCircle(31, 30, 1.8).fillCircle(41, 30, 1.8);
+          hero.lineStyle(2, 0x9c5841, 1).beginPath().arc(36, 32, 5, .25, Math.PI - .25, false).strokePath();
+          hero.fillStyle(0xf0cd75, 1).fillCircle(36, 53, 3.5);
+          hero.generateTexture('explorer', 72, 84);
+          hero.destroy();
+
+          stages.forEach((stage, stageIndex) => {
+            stage.optionArt.forEach((art, choiceIndex) => this.makeChoiceTexture(stageIndex, choiceIndex, art));
+          });
+        }
+
+        makeChoiceTexture(stageIndex, choiceIndex, art) {
+          const g = this.make.graphics({ x: 0, y: 0, add: false });
+          const key = `choice-${stageIndex}-${choiceIndex}`;
+          const points = (coords) => coords.map(([x, y]) => new Phaser.Geom.Point(x, y));
+          const palettes = {
+            squirrel: [0xc9793e, 0xf4ca91, 0x9e542e], rabbit: [0xe7d8c6, 0xffeff0, 0xd58b98], deer: [0xc99562, 0xf3dfbd, 0x805638],
+            frog: [0x6da84b, 0xc3e57b, 0x477c42], duck: [0xf0c64e, 0xffe998, 0xd78335], turtle: [0x64a67a, 0xa8cf82, 0x45724e],
+            monkey: [0x9b6541, 0xf0c999, 0x68422f], panda: [0xf5f1e8, 0xffffff, 0x303b38], fox: [0xd97842, 0xffe2bd, 0x9e4c32],
+            owl: [0x9c7652, 0xf0d5a4, 0x624c3a], bear: [0x9a6847, 0xe8c99d, 0x67442f], wolf: [0x858e91, 0xe2e5d8, 0x535e62],
+            firefly: [0x6e9a54, 0xf5dc68, 0x477246], whiteDeer: [0xe9dfc8, 0xfff8e6, 0x8b7958], forestGuardian: [0x648a55, 0xe6d29b, 0x416446]
+          };
+          const [coat, face, accent] = palettes[art] || palettes.squirrel;
+          g.fillStyle(0x294936, .16).fillEllipse(64, 103, 84, 14);
+
+          if (art === 'squirrel') {
+            g.lineStyle(13, coat, 1).strokeCircle(98, 67, 23);
+            g.lineStyle(5, 0xf1bf76, .9).strokeCircle(98, 67, 17);
+          }
+          if (art === 'rabbit') {
+            g.fillStyle(coat, 1).fillEllipse(49, 27, 19, 48).fillEllipse(78, 27, 19, 48);
+            g.fillStyle(accent, .9).fillEllipse(49, 28, 8, 32).fillEllipse(78, 28, 8, 32);
+          }
+          if (art === 'deer' || art === 'whiteDeer') {
+            const antler = art === 'deer' ? 0x805638 : 0x9b8a69;
+            [[42,48],[86,48]].forEach(([x,y],i) => {
+              const dir = i ? 1 : -1;
+              g.lineStyle(4, antler, 1).beginPath().moveTo(x,y).lineTo(x+dir*2,30).lineTo(x+dir*12,20).moveTo(x+dir*2,30).lineTo(x-dir*5,19).moveTo(x+dir*7,25).lineTo(x+dir*15,28).strokePath();
+            });
+          }
+          if (art === 'frog') {
+            g.fillStyle(coat, 1).fillCircle(45, 35, 13).fillCircle(83, 35, 13);
+            g.fillStyle(face, 1).fillCircle(45, 35, 7).fillCircle(83, 35, 7);
+            g.fillStyle(0x263d2f, 1).fillCircle(46, 36, 2).fillCircle(82, 36, 2);
+          }
+          if (art === 'duck') g.fillStyle(accent, 1).fillPoints(points([[58,65],[86,71],[58,78]]), true);
+          if (art === 'turtle') g.fillStyle(accent, 1).fillEllipse(64, 77, 72, 37);
+          if (art === 'monkey') g.fillStyle(face, 1).fillCircle(42, 57, 13).fillCircle(86, 57, 13);
+          if (art === 'panda') {
+            g.fillStyle(accent, 1).fillEllipse(48, 53, 17, 23).fillEllipse(80, 53, 17, 23);
+          }
+          if (art === 'fox' || art === 'wolf') {
+            g.fillStyle(coat, 1).fillPoints(points([[35,46],[42,15],[61,36],[83,16],[92,47]]), true);
+            g.fillStyle(art === 'fox' ? 0xffe5d0 : 0xdce1d8, 1).fillPoints(points([[42,37],[45,24],[54,37],[82,37],[86,25],[86,40]]), true);
+          }
+          if (art === 'owl') {
+            g.fillStyle(coat, 1).fillPoints(points([[36,47],[41,22],[58,40],[85,22],[92,48]]), true);
+            g.fillStyle(0xe9cf98, 1).fillEllipse(48, 59, 31, 37).fillEllipse(80, 59, 31, 37);
+          }
+          if (art === 'bear') g.fillStyle(coat, 1).fillCircle(39, 39, 14).fillCircle(89, 39, 14);
+          if (art === 'firefly') {
+            g.fillStyle(0xeaf5df, .82).fillEllipse(37, 57, 27, 37).fillEllipse(91, 57, 27, 37);
+            g.lineStyle(3, 0x789c6a, .9).beginPath().moveTo(58,34).lineTo(52,20).moveTo(70,34).lineTo(77,20).strokePath();
+            g.fillStyle(0xf6df76, .3).fillCircle(64, 72, 48);
+          }
+          if (art === 'forestGuardian') {
+            g.fillStyle(0x80a963, 1).fillPoints(points([[35,43],[43,19],[57,35],[65,9],[74,36],[89,19],[94,46]]), true);
+            g.fillStyle(0xd5e49a, .9).fillEllipse(65, 22, 11, 22);
+          }
+
+          if (art === 'turtle') {
+            g.fillStyle(coat, 1).fillCircle(64, 53, 36);
+            g.lineStyle(4, accent, 1).strokeEllipse(64, 68, 69, 40);
+            g.lineStyle(2, 0xd5e4a1, .85).beginPath().moveTo(64,49).lineTo(64,86).moveTo(45,60).lineTo(83,60).moveTo(50,78).lineTo(78,78).strokePath();
+            g.fillStyle(face, 1).fillCircle(64, 91, 12);
+          } else {
+            g.fillStyle(coat, 1).fillEllipse(64, 84, 49, 37).fillCircle(64, 58, 38);
+            if (!['frog','owl'].includes(art)) {
+              const earY = ['rabbit','deer','whiteDeer','fox','wolf','firefly','forestGuardian'].includes(art) ? 43 : 40;
+              if (!['rabbit','deer','whiteDeer','fox','wolf','firefly','forestGuardian','squirrel','bear'].includes(art)) {
+                g.fillStyle(coat, 1).fillCircle(42, earY, 12).fillCircle(86, earY, 12);
+                g.fillStyle(face, 1).fillCircle(42, earY, 6).fillCircle(86, earY, 6);
+              }
+            }
+            if (['monkey','panda','fox','wolf','owl','bear'].includes(art)) {
+              g.fillStyle(face, 1).fillEllipse(64, 69, 42, 28);
+            }
+            if (art === 'firefly') g.fillStyle(face, 1).fillCircle(64, 63, 21);
+            if (art === 'forestGuardian') g.fillStyle(face, 1).fillEllipse(64, 69, 42, 27);
+            if (art === 'panda') {
+              g.fillStyle(accent, 1).fillEllipse(50, 57, 16, 22).fillEllipse(78, 57, 16, 22);
+              g.fillStyle(0xffffff, 1).fillCircle(51, 57, 4).fillCircle(77, 57, 4);
+            } else {
+              g.fillStyle(0x26382c, 1).fillCircle(51, 57, 3.1).fillCircle(77, 57, 3.1);
+            }
+            if (art === 'frog') g.fillStyle(0xc9ed86, 1).fillEllipse(64, 74, 35, 21);
+            else g.fillStyle(face, 1).fillEllipse(64, 72, 30, 19);
+            if (art === 'duck') g.fillStyle(0xe48c39, 1).fillPoints(points([[55,69],[73,69],[64,80]]), true);
+            else if (art !== 'firefly') g.fillStyle(accent, 1).fillEllipse(64, 68, 11, 8);
+            g.lineStyle(2, art === 'duck' ? 0x9b6136 : 0x9b594b, 1).beginPath().arc(64, 78, 7, .25, Math.PI - .25, false).strokePath();
+            if (art === 'whiteDeer') g.fillStyle(0xe6c96c, 1).fillCircle(64, 85, 4);
+            if (art === 'squirrel') g.fillStyle(0xe6b76d, 1).fillEllipse(64, 92, 12, 15);
+          }
+
+          g.generateTexture(key, 128, 128);
+          g.destroy();
+        }
+        spawnQuestion({ gracePeriod = false } = {}) {
+          const stage = stages[this.stageIndex];
+          const q = this.recallQuestion || stage.questions[this.questionIndex];
+          this.currentQuestion = q;
+          this.isRecallRound = Boolean(this.recallQuestion);
+          const answer = q.a * q.b;
+          const distractors = this.makeDistractors(answer, q.a, q.b);
+          const choices = Phaser.Utils.Array.Shuffle([answer, ...distractors]);
+          const anchors = mechanic === 'planning'
+            ? Phaser.Utils.Array.Shuffle([[145, 135], [480, 132], [815, 135], [145, 250], [815, 250], [280, 205], [680, 205], [480, 300]].filter(([x, y]) => Math.hypot(this.player.x - x, this.player.y - y) > 108)).slice(0, 3)
+            : Phaser.Utils.Array.Shuffle([[160, 157], [480, 246], [800, 157]]);
+          this.acceptingAnswer = !gracePeriod;
+          this.moveTarget = null;
+          this.clearTargets();
+          if (mechanic !== 'planning' || !this.playerHasMoved) this.player.setPosition(480, 365);
+          this.player.setVelocity(0, 0);
+          this.selectedRoute = mechanic === 'choice' ? null : 'safe';
+          ui.routeButtons.forEach((button) => button.setAttribute('aria-pressed', 'false'));
+          this.stopQuestionTimer();
+          this.timerRunning = false;
+          this.questionTime = 20;
+          this.updateUI();
+          const prompt = mechanic === 'memory' && this.isRecallRound ? `回想上一題 ${q.a} × ${q.b}` : `找出 ${answer}`;
+          this.addToast(gracePeriod ? '準備下一題…' : `完成 ${stage.name} 的乘法任務！${prompt}`, '#18334b', gracePeriod ? 800 : 900);
+          choices.forEach((value, index) => {
+            const [x, y] = anchors[index];
+            const orb = this.physics.add.sprite(x, y, `choice-${this.stageIndex}-${index}`);
+            orb.body.setCircle(44, 20, 20);
+            orb.setImmovable(true);
+            orb.setData('answer', value);
+            orb.setData('correct', value === answer);
+            orb.setData('baseY', y);
+            orb.setData('phase', Math.random() * Math.PI * 2);
+            const label = this.add.text(x, y - 9, String(value), {
+              fontFamily: 'system-ui, sans-serif', fontSize: value > 99 ? '25px' : value > 9 ? '30px' : '34px',
+              fontStyle: '900', color: '#18334b', stroke: '#fffdf7', strokeThickness: 3
+            }).setOrigin(.5).setDepth(4);
+            label.setPosition(x, y);
+            orb.setDepth(3);
+            orb.setData('label', label);
+            this.orbs.add(orb);
+            this.targets.push(orb);
+            this.labels.push(label);
+          });
+          if (gracePeriod) {
+            this.time.delayedCall(800, () => {
+              if (!this.scene.isActive() || this.stageIndex >= stages.length || this.acceptingAnswer || this.awaitingStart || this.awaitingStage) return;
+              this.acceptingAnswer = true;
+              if (mechanic === 'choice' && !this.selectedRoute) this.addToast('先在上方選擇安全小徑或冒險捷徑', '#315239', 1000);
+              else {
+                this.addToast(`${this.isRecallRound ? '回想' : '尋找'} ${answer}！`, '#18334b', 650);
+                this.startQuestionTimer();
+              }
+            });
+          } else {
+            this.startQuestionTimer();
+          }
+        }
+
+        startQuestionTimer() {
+          if (mechanic !== 'timer' || this.timerRunning || !this.acceptingAnswer) return;
+          this.timerRunning = true;
+          this.questionTimer = this.time.addEvent({
+            delay: 1000,
+            loop: true,
+            callback: () => {
+              this.questionTime -= 1;
+              ui.timerStat.textContent = String(this.questionTime);
+              if (this.questionTime <= 0) this.timeExpired();
+            }
+          });
+        }
+
+        stopQuestionTimer() {
+          if (this.questionTimer) this.questionTimer.remove();
+          this.questionTimer = null;
+          this.timerRunning = false;
+        }
+
+        timeExpired() {
+          if (!this.acceptingAnswer) return;
+          this.stopQuestionTimer();
+          this.acceptingAnswer = false;
+          this.score -= 5;
+          this.lives -= 1;
+          this.updateUI();
+          if (this.lives <= 0) return this.failGame();
+          this.addToast(`時間到！−5 分，剩下 ${this.lives} 次救援機會`, '#b64f46', 1300);
+          this.time.delayedCall(1350, () => {
+            if (!this.scene.isActive() || this.awaitingStart || this.awaitingStage) return;
+            this.spawnQuestion({ gracePeriod: true });
+          });
+        }
+
+        makeDistractors(answer, a, b) {
+          const candidates = [answer + a, answer - a, answer + b, answer - b, answer + 2, answer - 2, answer + 3, answer - 3];
+          const unique = [...new Set(candidates.filter(value => value > 0 && value !== answer))];
+          Phaser.Utils.Array.Shuffle(unique);
+          return unique.slice(0, 2);
+        }
+
+        collectAnswer(player, orb) {
+          if (!this.acceptingAnswer || !orb.active || (mechanic === 'choice' && !this.selectedRoute)) return;
+          this.acceptingAnswer = false;
+          this.stopQuestionTimer();
+          this.moveTarget = null;
+          const q = this.currentQuestion;
+          const answer = q.a * q.b;
+          const isCorrect = orb.getData('correct');
+          const label = orb.getData('label');
+          this.player.setVelocity(0, 0);
+          if (isCorrect) {
+            const earned = mechanic === 'choice' && this.selectedRoute === 'risky' ? 20 : 10;
+            this.score += earned;
+            this.correctStreak += 1;
+            if (!this.isRecallRound) this.solved += 1;
+            if (mechanic === 'reward' && this.correctStreak % 3 === 0) {
+              this.score += 15;
+              ui.rewardStat.textContent = String(Number(ui.rewardStat.textContent) + 1);
+              this.addToast(`連續答對 ${this.correctStreak} 題！獲得動物夥伴徽章，額外 +15 分`, '#8a5b24', 1300);
+            } else if (mechanic === 'lives' && this.correctStreak % 2 === 0 && this.lives < 3) {
+              this.lives += 1;
+              this.addToast(`連續答對兩題！救援機會補回一格，現在有 ${this.lives} 格`, '#167d78', 1300);
+            }
+            this.updateUI();
+            const correctFeedback = mechanic === 'feedback'
+              ? `${q.a} × ${q.b} 就是 ${q.a} 組、每組 ${q.b} 個，合起來 ${answer}。答對 +10 分！`
+              : mechanic === 'choice' && this.selectedRoute === 'risky'
+                ? `冒險捷徑成功！答對 +20 分　✦`
+                : `答對了！ +${earned} 分　✦`;
+            this.addToast(correctFeedback, '#167d78', mechanic === 'feedback' ? 1600 : 1000);
+            this.tweens.add({ targets: [orb, label], scale: 1.45, alpha: 0, duration: 280, ease: 'Back.easeIn', onComplete: () => this.advance() });
+          } else {
+            const penalty = mechanic === 'choice' && this.selectedRoute === 'risky' ? 10 : 5;
+            this.score -= penalty;
+            this.lives -= 1;
+            this.correctStreak = 0;
+            this.updateUI();
+            if (this.lives === 0) {
+              this.failGame();
+              return;
+            }
+            const explanation = `${q.a} × ${q.b} = ${answer}，可想成 ${q.a} 組、每組 ${q.b} 個`;
+            const response = mechanic === 'feedback'
+              ? `這次選到 ${orb.getData('answer')}。${explanation}。請再試一次，扣 ${penalty} 分。`
+              : `答錯了！ −${penalty} 分，剩下 ${this.lives} 次救援機會`;
+            this.addToast(response, '#b64f46', mechanic === 'feedback' ? 1900 : 1450);
+            this.tweens.add({
+              targets: [orb, label], scale: .6, alpha: 0, duration: 250,
+              onComplete: () => { orb.destroy(); label.destroy(); }
+            });
+            this.time.delayedCall(mechanic === 'feedback' ? 1650 : 1350, () => {
+              if (!this.scene.isActive() || this.awaitingStart || this.awaitingStage) return;
+              this.acceptingAnswer = true;
+              if (mechanic === 'timer') this.startQuestionTimer();
+            });
+          }
+        }
+
+        advance() {
+          if (mechanic === 'memory' && !this.isRecallRound) {
+            this.recallQuestion = this.currentQuestion;
+            this.questionIndex += 1;
+            this.spawnQuestion({ gracePeriod: true });
+            return;
+          }
+          if (this.isRecallRound) {
+            this.isRecallRound = false;
+            this.recallQuestion = null;
+          } else {
+            this.questionIndex += 1;
+          }
+          if (this.questionIndex < stages[this.stageIndex].questions.length) {
+            this.spawnQuestion({ gracePeriod: true });
+            return;
+          }
+          if (this.stageIndex === stages.length - 1) return this.finishGame();
+          this.showStageCheckpoint();
+        }
+
+        showStageCheckpoint() {
+          const completed = stages[this.stageIndex];
+          const next = stages[this.stageIndex + 1];
+          this.awaitingStage = true;
+          this.acceptingAnswer = false;
+          this.moveTarget = null;
+          this.clearTargets();
+          this.player.setPosition(480, 365).setVelocity(0, 0);
+          ui.resultIcon.textContent = '✦';
+          ui.resultTitle.textContent = `第 ${this.stageIndex + 1} 關完成！`;
+          ui.finalScore.textContent = `${completed.checkpoint} 下一站：${next.name}。${next.goal}。`;
+          ui.restart.textContent = `前往第 ${this.stageIndex + 2} 關`;
+          ui.overlay.hidden = false;
+        }
+
+        continueStage() {
+          if (!this.awaitingStage) return;
+          this.awaitingStage = false;
+          this.stageIndex += 1;
+          this.questionIndex = 0;
+          this.recallQuestion = null;
+          this.isRecallRound = false;
+          ui.overlay.hidden = true;
+          this.drawStageWorld();
+          this.spawnQuestion({ gracePeriod: true });
+        }
+
+        clearTargets() {
+          // Keep labels independently: destroying a missed orb clears its data,
+          // so looking up labels only through the orb can leave old numbers behind.
+          this.labels.forEach((label) => { if (label.active) label.destroy(); });
+          this.labels = [];
+          this.targets.forEach((orb) => { if (orb.active) orb.destroy(); });
+          this.targets = [];
+        }
+
+        addToast(message, color, duration) {
+          if (this.feedbackTimer) this.feedbackTimer.remove();
+          ui.feedback.textContent = message;
+          ui.feedback.style.color = color;
+          ui.feedback.classList.add('visible');
+          this.feedbackTimer = this.time.delayedCall(duration, () => ui.feedback.classList.remove('visible'));
+        }
+
+        updateUI() {
+          const isComplete = this.stageIndex >= stages.length;
+          if (!isComplete) {
+            const stage = stages[this.stageIndex];
+            const q = this.currentQuestion || stage.questions[this.questionIndex];
+            ui.question.innerHTML = `${q.a} × ${q.b} <span class="equals">=</span> <span class="unknown">?</span>`;
+            ui.questionLabel.textContent = mechanic === 'memory' && this.isRecallRound
+              ? `記憶提取・回想上一題`
+              : `第 ${this.stageIndex + 1} 關・${stage.name}・第 ${Math.min(this.questionIndex + 1, stage.questions.length)} 題`;
+            ui.stageGoal.textContent = `本關任務：${stage.goal}`;
+            const decomposition = `線索：把 ${q.b} 拆成 ${q.b - 1} + 1，先算 ${q.a} × ${q.b - 1}，再加 ${q.a}`;
+            ui.mechanicNote.textContent = mechanic === 'clue'
+              ? decomposition
+              : mechanic === 'mission'
+                ? '任務目標：完成本區三道乘法題，蒐集森林路標'
+                : mechanic === 'progression'
+                  ? '難度逐關提升：從基礎倍數一路挑戰到 12 倍'
+              : mechanic === 'planning'
+                ? '規劃移動路線：探險家會留在上一題抵達的位置'
+                : mechanic === 'memory' && this.isRecallRound
+                  ? '先回想剛才的乘法事實，再沿小徑尋找動物朋友'
+                : mechanic === 'memory'
+                  ? '每題答對後先回想一次，再繼續深入森林'
+                  : '';
+            ui.stage.textContent = `${this.stageIndex + 1} / ${stages.length}`;
+            ui.round.textContent = `${Math.min(this.questionIndex + 1, stage.questions.length)} / ${stage.questions.length}`;
+          }
+          ui.score.textContent = String(this.score);
+          ui.lives.textContent = String(this.lives);
+          ui.progressLabel.textContent = `森林探索 ${this.solved} / ${totalQuestions} 題`;
+          ui.progressFill.style.width = `${(this.solved / totalQuestions) * 100}%`;
+          ui.livesStreakStat.textContent = `${this.correctStreak % 2} / 2`;
+          ui.timerStat.textContent = String(this.questionTime);
+        }
+
+        finishGame() {
+          this.acceptingAnswer = false;
+          this.awaitingStart = false;
+          this.awaitingStage = false;
+          this.clearTargets();
+          this.player.setVelocity(0, 0);
+          ui.question.innerHTML = '找到出口 <span class="equals">✦</span>';
+          ui.questionLabel.textContent = '探險成功・平安走出森林';
+          ui.stageGoal.textContent = '五關乘法任務全數完成，動物朋友帶探險家找到森林出口！';
+          ui.stage.textContent = '5 / 5';
+          ui.round.textContent = '15 / 15';
+          ui.resultIcon.textContent = '🏆';
+          ui.resultTitle.textContent = '探險家平安回家！';
+          ui.finalScore.textContent = `你完成五關、解開 15 道乘法題，和動物朋友一起走出森林，得到 ${this.score} 分！`;
+          ui.restart.textContent = '再玩一次';
+          ui.overlay.hidden = false;
+          this.addToast('太厲害了！大家一起找到森林出口！', '#477d4c', 2000);
+        }
+
+        restartGame() {
+          this.stageIndex = 0;
+          this.questionIndex = 0;
+          this.score = 0;
+          this.lives = 3;
+          this.solved = 0;
+          this.correctStreak = 0;
+          this.recallQuestion = null;
+          this.isRecallRound = false;
+          this.playerHasMoved = false;
+          this.stopQuestionTimer();
+          ui.rewardStat.textContent = '0';
+          this.awaitingStart = false;
+          this.awaitingStage = false;
+          this.moveTarget = null;
+          this.player.setPosition(480, 365).setVelocity(0, 0);
+          ui.overlay.hidden = true;
+          this.drawStageWorld();
+          this.spawnQuestion();
+        }
+
+        failGame() {
+          this.stopQuestionTimer();
+          this.acceptingAnswer = false;
+          this.awaitingStart = false;
+          this.awaitingStage = false;
+          this.moveTarget = null;
+          this.clearTargets();
+          this.player.setVelocity(0, 0);
+          ui.question.innerHTML = '森林迷霧 <span class="unknown">!</span>';
+          ui.questionLabel.textContent = '救援機會已用完';
+          ui.stageGoal.textContent = '再試一次，用乘法找到動物朋友留下的路標';
+          ui.resultIcon.textContent = '🌫️';
+          ui.resultTitle.textContent = '迷霧擋住回家的路';
+          ui.finalScore.textContent = `救援機會用完，探險家暫時迷失在森林裡。本次得到 ${this.score} 分。動物朋友還在等你，再挑戰一次吧！`;
+          ui.restart.textContent = '再試一次';
+          ui.lives.textContent = '0';
+          ui.overlay.hidden = false;
+          this.addToast('森林起了迷霧，動物朋友正等你找回路標！', '#8c5148', 1800);
+        }
+
+        update(time) {
+          if (!this.acceptingAnswer || !this.moveTarget) {
+            this.player.setVelocity(0, 0);
+          } else {
+            const dx = this.moveTarget.x - this.player.x;
+            const dy = this.moveTarget.y - this.player.y;
+            const distance = Math.hypot(dx, dy);
+            const speed = 220;
+            if (distance < 10) {
+              this.moveTarget = null;
+              this.player.setVelocity(0, 0);
+            } else {
+              this.player.setVelocity((dx / distance) * speed, (dy / distance) * speed);
+            }
+            if (dx < 0) this.player.setFlipX(true);
+            if (dx > 0) this.player.setFlipX(false);
+          }
+          this.targets.forEach((orb) => {
+            if (!orb.active) return;
+            const bob = Math.sin(time / 430 + orb.getData('phase')) * 7;
+            orb.y = orb.getData('baseY') + bob;
+            orb.getData('label').setPosition(orb.x, orb.y);
+          });
+          if (this.player.body && this.player.body.speed > 5) {
+            this.player.setAngle(Math.sin(time / 70) * 2);
+          } else {
+            this.player.setAngle(0);
+          }
+        }
+      }
+
+      const game = new Phaser.Game({
+        type: Phaser.AUTO,
+        parent: 'game',
+        width: 960,
+        height: 440,
+        backgroundColor: '#dff5ec',
+        physics: { default: 'arcade', arcade: { gravity: { x: 0, y: 0 }, debug: false } },
+        scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_BOTH },
+        scene: StarIsland,
+        render: { antialias: true, pixelArt: false },
+        input: { keyboard: { target: window } }
+      });
+      ui.restart.addEventListener('click', () => {
+        const scene = game.scene.getScene('StarIsland');
+        if (!scene || !scene.scene.isActive()) return;
+        if (scene.awaitingStart) scene.startGame();
+        else if (scene.awaitingStage) scene.continueStage();
+        else scene.restartGame();
+      });
+      ui.routeButtons.forEach((button) => button.addEventListener('click', () => {
+        const scene = game.scene.getScene('StarIsland');
+        if (!scene || !scene.scene.isActive() || mechanic !== 'choice' || !scene.acceptingAnswer) return;
+        scene.selectedRoute = button.dataset.route;
+        ui.routeButtons.forEach((choice) => choice.setAttribute('aria-pressed', String(choice === button)));
+        const risky = scene.selectedRoute === 'risky';
+        scene.addToast(risky ? '冒險捷徑：答對 +20 分，答錯 −10 分' : '安全小徑：答對 +10 分，答錯 −5 分', risky ? '#a35817' : '#167d78', 1100);
+        if (scene.timerRunning === false && mechanic === 'timer') scene.startQuestionTimer();
+      }));
+    })();
+  </script>
+</body>
+</html>
