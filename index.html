@@ -43,6 +43,7 @@
     .dashboard { display: grid; grid-template-columns: 1fr auto; gap: 16px 24px; padding: 20px 24px 17px; }
     .question-block { align-self: center; }
     .eyebrow { margin: 0 0 4px; color: var(--muted); font-size: 12px; font-weight: 800; letter-spacing: .11em; }
+    .stage-goal { margin: 4px 0 0; color: var(--muted); font-size: 12px; font-weight: 700; }
     .question { margin: 0; color: var(--ink); font-size: clamp(24px, 4vw, 34px); font-weight: 900; letter-spacing: .035em; }
     .question .equals { color: var(--teal); }
     .question .unknown { display: inline-grid; min-width: 42px; place-items: center; color: #ea684f; }
@@ -96,8 +97,11 @@
       .masthead p { font-size: 11px; }
       .badge { padding: 7px 9px; font-size: 11px; }
       .dashboard { grid-template-columns: 1fr; gap: 11px; padding: 17px 16px 13px; }
-      .question-block { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+      .question-block { display: grid; grid-template-columns: 1fr auto; align-items: baseline; gap: 2px 8px; }
+      .eyebrow { grid-column: 1; grid-row: 1; }
       .eyebrow { margin: 0; font-size: 10px; }
+      .question { grid-column: 1 / -1; grid-row: 2; }
+      .stage-goal { grid-column: 1 / -1; grid-row: 3; font-size: 10px; }
       .question { font-size: clamp(23px, 7vw, 31px); }
       .stats { display: grid; grid-template-columns: repeat(3, 1fr); }
       .stat { min-width: 0; padding: 7px 6px; }
@@ -120,7 +124,7 @@
       <div class="brand-icon" aria-hidden="true">🚀</div>
       <div>
         <h1>乘法星球</h1>
-        <p>數學探險隊・找出星星上的正確答案！</p>
+        <p>由簡到難，解開五個星球的乘法任務！</p>
       </div>
       <div class="badge">✦ 5 關冒險</div>
     </header>
@@ -130,6 +134,7 @@
         <div class="question-block" aria-live="polite">
           <p class="eyebrow" id="question-label">第 1 關・第 1 題</p>
           <p class="question" id="question">2 × 3 <span class="equals">=</span> <span class="unknown">?</span></p>
+          <p class="stage-goal" id="stage-goal">本關任務：用 2、5、10 的倍數計算補給</p>
         </div>
         <div class="stats" aria-label="遊戲進度">
           <div class="stat"><span>關卡</span><strong id="stage-stat">1 / 5</strong></div>
@@ -147,8 +152,8 @@
         <div id="game" aria-label="使用方向鍵或 WASD 移動太空探險員，碰觸答案星星作答"></div>
         <div class="result-overlay" id="result-overlay" hidden>
           <div class="result-box">
-            <div class="trophy" aria-hidden="true">🏆</div>
-            <h2>星際任務完成！</h2>
+            <div class="trophy" id="result-icon" aria-hidden="true">🏆</div>
+            <h2 id="result-title">星際任務完成！</h2>
             <p id="final-score">你完成了 5 個關卡！</p>
             <button class="restart" id="restart-button" type="button">再玩一次</button>
           </div>
@@ -173,22 +178,25 @@
   <script>
     (() => {
       const stages = [
-        [{ a: 2, b: 3 }, { a: 4, b: 2 }, { a: 5, b: 3 }],
-        [{ a: 3, b: 6 }, { a: 4, b: 7 }, { a: 8, b: 3 }],
-        [{ a: 6, b: 7 }, { a: 8, b: 6 }, { a: 9, b: 4 }],
-        [{ a: 7, b: 8 }, { a: 9, b: 6 }, { a: 8, b: 9 }],
-        [{ a: 12, b: 7 }, { a: 11, b: 8 }, { a: 12, b: 9 }]
+        { name: '雙倍與五倍星港', goal: '用 2、5、10 的倍數計算補給', questions: [{ a: 2, b: 3 }, { a: 5, b: 4 }, { a: 10, b: 3 }] },
+        { name: '三與四倍星雲', goal: '把 3 組或 4 組看成重複相加', questions: [{ a: 3, b: 6 }, { a: 4, b: 7 }, { a: 3, b: 8 }] },
+        { name: '六與七倍行星', goal: '熟練 6、7 的乘法事實', questions: [{ a: 6, b: 7 }, { a: 7, b: 8 }, { a: 6, b: 9 }] },
+        { name: '八與九倍星門', goal: '挑戰 8、9 的乘法並找出規律', questions: [{ a: 8, b: 8 }, { a: 9, b: 6 }, { a: 9, b: 7 }] },
+        { name: '綜合乘法核心', goal: '運用 11、12 倍完成最終補給', questions: [{ a: 11, b: 8 }, { a: 12, b: 7 }, { a: 12, b: 9 }] }
       ];
-      const totalQuestions = stages.reduce((sum, stage) => sum + stage.length, 0);
+      const totalQuestions = stages.reduce((sum, stage) => sum + stage.questions.length, 0);
       const ui = {
         question: document.getElementById('question'),
         questionLabel: document.getElementById('question-label'),
+        stageGoal: document.getElementById('stage-goal'),
         stage: document.getElementById('stage-stat'),
         round: document.getElementById('round-stat'),
         score: document.getElementById('score-stat'),
         progressLabel: document.getElementById('progress-label'),
         progressFill: document.getElementById('progress-fill'),
         overlay: document.getElementById('result-overlay'),
+        resultIcon: document.getElementById('result-icon'),
+        resultTitle: document.getElementById('result-title'),
         finalScore: document.getElementById('final-score'),
         restart: document.getElementById('restart-button'),
         feedback: document.getElementById('feedback')
@@ -226,6 +234,7 @@
           this.score = 0;
           this.solved = 0;
           this.acceptingAnswer = true;
+          this.awaitingStage = false;
           this.targets = [];
           this.labels = [];
           this.feedbackTimer = null;
@@ -244,7 +253,9 @@
           this.physics.add.overlap(this.player, this.orbs, this.collectAnswer, undefined, this);
           this.spawnQuestion();
           this.input.keyboard.on('keydown-ENTER', () => {
-            if (!ui.overlay.hidden) this.restartGame();
+            if (ui.overlay.hidden) return;
+            if (this.awaitingStage) this.continueStage();
+            else this.restartGame();
           });
         }
 
@@ -323,7 +334,8 @@
         }
 
         spawnQuestion({ gracePeriod = false } = {}) {
-          const q = stages[this.stageIndex][this.questionIndex];
+          const stage = stages[this.stageIndex];
+          const q = stage.questions[this.questionIndex];
           const answer = q.a * q.b;
           const distractors = this.makeDistractors(answer, q.a, q.b);
           const choices = Phaser.Utils.Array.Shuffle([answer, ...distractors]);
@@ -334,7 +346,7 @@
           // position cannot overlap a new orb and trigger an accidental penalty.
           this.player.setPosition(480, 365).setVelocity(0, 0);
           this.updateUI();
-          this.addToast(gracePeriod ? '準備下一題…' : `尋找 ${answer}！`, '#18334b', gracePeriod ? 800 : 650);
+          this.addToast(gracePeriod ? '準備下一題…' : `完成 ${stage.name} 的乘法任務！找出 ${answer}`, '#18334b', gracePeriod ? 800 : 900);
           choices.forEach((value, index) => {
             const [x, y] = anchors[index];
             const orb = this.physics.add.sprite(x, y, 'answer-orb');
@@ -374,7 +386,8 @@
         collectAnswer(player, orb) {
           if (!this.acceptingAnswer || !orb.active) return;
           this.acceptingAnswer = false;
-          const answer = stages[this.stageIndex][this.questionIndex].a * stages[this.stageIndex][this.questionIndex].b;
+          const q = stages[this.stageIndex].questions[this.questionIndex];
+          const answer = q.a * q.b;
           const isCorrect = orb.getData('correct');
           const label = orb.getData('label');
           this.player.setVelocity(0, 0);
@@ -387,7 +400,7 @@
           } else {
             this.score -= 5;
             this.updateUI();
-            this.addToast(`再試試看！ −5 分　提示：答案是 ${answer}`, '#b64f46', 1450);
+            this.addToast(`再試一次！ −5 分　${q.a} 組、每組 ${q.b} 個，共 ${answer}`, '#b64f46', 1750);
             this.tweens.add({
               targets: [orb, label], scale: .6, alpha: 0, duration: 250,
               onComplete: () => { orb.destroy(); label.destroy(); }
@@ -398,15 +411,35 @@
 
         advance() {
           this.questionIndex += 1;
-          if (this.questionIndex >= stages[this.stageIndex].length) {
-            this.stageIndex += 1;
-            this.questionIndex = 0;
-          }
-          if (this.stageIndex >= stages.length) {
-            this.finishGame();
-          } else {
+          if (this.questionIndex < stages[this.stageIndex].questions.length) {
             this.spawnQuestion({ gracePeriod: true });
+            return;
           }
+          if (this.stageIndex === stages.length - 1) return this.finishGame();
+          this.showStageCheckpoint();
+        }
+
+        showStageCheckpoint() {
+          const completed = stages[this.stageIndex];
+          const next = stages[this.stageIndex + 1];
+          this.awaitingStage = true;
+          this.acceptingAnswer = false;
+          this.clearTargets();
+          this.player.setPosition(480, 365).setVelocity(0, 0);
+          ui.resultIcon.textContent = '✦';
+          ui.resultTitle.textContent = `第 ${this.stageIndex + 1} 關完成！`;
+          ui.finalScore.textContent = `${completed.name}通關。${completed.goal}。下一站：${next.name}，挑戰會再提高。`;
+          ui.restart.textContent = `前往第 ${this.stageIndex + 2} 關`;
+          ui.overlay.hidden = false;
+        }
+
+        continueStage() {
+          if (!this.awaitingStage) return;
+          this.awaitingStage = false;
+          this.stageIndex += 1;
+          this.questionIndex = 0;
+          ui.overlay.hidden = true;
+          this.spawnQuestion({ gracePeriod: true });
         }
 
         clearTargets() {
@@ -429,11 +462,13 @@
         updateUI() {
           const isComplete = this.stageIndex >= stages.length;
           if (!isComplete) {
-            const q = stages[this.stageIndex][this.questionIndex];
+            const stage = stages[this.stageIndex];
+            const q = stage.questions[this.questionIndex];
             ui.question.innerHTML = `${q.a} × ${q.b} <span class="equals">=</span> <span class="unknown">?</span>`;
-            ui.questionLabel.textContent = `第 ${this.stageIndex + 1} 關・第 ${this.questionIndex + 1} 題`;
+            ui.questionLabel.textContent = `第 ${this.stageIndex + 1} 關・${stage.name}・第 ${this.questionIndex + 1} 題`;
+            ui.stageGoal.textContent = `本關任務：${stage.goal}`;
             ui.stage.textContent = `${this.stageIndex + 1} / ${stages.length}`;
-            ui.round.textContent = `${this.questionIndex + 1} / ${stages[this.stageIndex].length}`;
+            ui.round.textContent = `${this.questionIndex + 1} / ${stage.questions.length}`;
           }
           ui.score.textContent = String(this.score);
           ui.progressLabel.textContent = `星球探索 ${this.solved} / ${totalQuestions} 題`;
@@ -442,13 +477,18 @@
 
         finishGame() {
           this.acceptingAnswer = false;
+          this.awaitingStage = false;
           this.clearTargets();
           this.player.setVelocity(0, 0);
           ui.question.innerHTML = '任務完成 <span class="equals">✦</span>';
           ui.questionLabel.textContent = '乘法星球探險隊・全關通過';
+          ui.stageGoal.textContent = '你已完成由基礎倍數到綜合乘法的五階段挑戰';
           ui.stage.textContent = '5 / 5';
           ui.round.textContent = '15 / 15';
+          ui.resultIcon.textContent = '🏆';
+          ui.resultTitle.textContent = '星際任務完成！';
           ui.finalScore.textContent = `你完成了 5 個關卡、15 道乘法題，得到 ${this.score} 分！`;
+          ui.restart.textContent = '再玩一次';
           ui.overlay.hidden = false;
           this.addToast('太厲害了！全關完成！', '#167d78', 2000);
         }
@@ -458,6 +498,7 @@
           this.questionIndex = 0;
           this.score = 0;
           this.solved = 0;
+          this.awaitingStage = false;
           this.player.setPosition(480, 365).setVelocity(0, 0);
           Object.keys(touchDirections).forEach(direction => { touchDirections[direction] = false; });
           ui.overlay.hidden = true;
@@ -508,7 +549,9 @@
       });
       ui.restart.addEventListener('click', () => {
         const scene = game.scene.getScene('StarIsland');
-        if (scene && scene.scene.isActive()) scene.restartGame();
+        if (!scene || !scene.scene.isActive()) return;
+        if (scene.awaitingStage) scene.continueStage();
+        else scene.restartGame();
       });
     })();
   </script>
