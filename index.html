@@ -53,6 +53,8 @@
     .stat strong { display: block; margin-top: 1px; color: var(--ink); font-size: 19px; font-variant-numeric: tabular-nums; }
     .stat.score { background: #fff0dc; }
     .stat.score strong { color: #a35817; }
+    .stat.rescue { background: #fce9eb; }
+    .stat.rescue strong { color: #ae4755; }
     .progress-row { grid-column: 1 / -1; display: flex; align-items: center; gap: 12px; }
     .progress-label { flex: 0 0 auto; color: var(--muted); font-size: 12px; font-weight: 700; }
     .progress-track { height: 8px; flex: 1; overflow: hidden; border-radius: 99px; background: #e6eeea; }
@@ -95,7 +97,7 @@
       .question { grid-column: 1 / -1; grid-row: 2; }
       .stage-goal { grid-column: 1 / -1; grid-row: 3; font-size: 10px; }
       .question { font-size: clamp(23px, 7vw, 31px); }
-      .stats { display: grid; grid-template-columns: repeat(3, 1fr); }
+      .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
       .stat { min-width: 0; padding: 7px 6px; }
       .stat strong { font-size: 17px; }
       .progress-row { gap: 8px; }
@@ -115,7 +117,7 @@
       <div class="brand-icon" aria-hidden="true">🚀</div>
       <div>
         <h1>乘法星球</h1>
-        <p>由簡到難，解開五個星球的乘法任務！</p>
+        <p>太空人脫離軌道了，解開乘法任務帶他回地球！</p>
       </div>
       <div class="badge">✦ 5 關冒險</div>
     </header>
@@ -131,16 +133,17 @@
           <div class="stat"><span>關卡</span><strong id="stage-stat">1 / 5</strong></div>
           <div class="stat"><span>本關題數</span><strong id="round-stat">1 / 3</strong></div>
           <div class="stat score"><span>探險分數</span><strong id="score-stat">0</strong></div>
+          <div class="stat rescue"><span>救援機會</span><strong id="life-stat">3</strong></div>
         </div>
         <div class="progress-row" aria-label="總進度">
-          <span class="progress-label" id="progress-label">星球探索 0 / 15 題</span>
+          <span class="progress-label" id="progress-label">星際探索 0 / 15 題</span>
           <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
         </div>
       </div>
 
       <div class="board-wrap">
         <div class="feedback" id="feedback" role="status" aria-live="polite"></div>
-        <div id="game" aria-label="使用滑鼠點選答案星球，太空探險員會自動移動過去作答"></div>
+        <div id="game" aria-label="使用滑鼠點選答案目標，太空探險員會自動移動過去作答"></div>
         <div class="result-overlay" id="result-overlay" hidden>
           <div class="result-box">
             <div class="trophy" id="result-icon" aria-hidden="true">🏆</div>
@@ -154,7 +157,7 @@
       <footer class="below">
         <div class="hint">
           <div class="hint-icon" aria-hidden="true">✦</div>
-          <div><strong>點選答案星球，角色會自動前往</strong><br>也能點擊空白處移動。答對 +10 分，答錯 −5 分。</div>
+          <div><strong>點選正確答案目標，太空人會自動前往</strong><br>也能點擊空白處移動。答對 +10 分，答錯 −5 分並消耗一次救援機會，答錯三次會被外星人抓走。</div>
         </div>
       </footer>
     </section>
@@ -163,11 +166,11 @@
   <script>
     (() => {
       const stages = [
-        { name: '雙倍與五倍星港', goal: '用 2、5、10 的倍數計算補給', questions: [{ a: 2, b: 3 }, { a: 5, b: 4 }, { a: 10, b: 3 }] },
-        { name: '三與四倍星雲', goal: '把 3 組或 4 組看成重複相加', questions: [{ a: 3, b: 6 }, { a: 4, b: 7 }, { a: 3, b: 8 }] },
-        { name: '六與七倍行星', goal: '熟練 6、7 的乘法事實', questions: [{ a: 6, b: 7 }, { a: 7, b: 8 }, { a: 6, b: 9 }] },
-        { name: '八與九倍星門', goal: '挑戰 8、9 的乘法並找出規律', questions: [{ a: 8, b: 8 }, { a: 9, b: 6 }, { a: 9, b: 7 }] },
-        { name: '綜合乘法核心', goal: '運用 11、12 倍完成最終補給', questions: [{ a: 11, b: 8 }, { a: 12, b: 7 }, { a: 12, b: 9 }] }
+        { name: '行星遠征區', worldTitle: '行星遠征區', background: 0xdff5ec, foreground: '#537b70', optionArt: ['saturn', 'mars', 'earth'], goal: '用 2、5、10 的倍數收集土星、火星與地球的返航座標', checkpoint: '土星、火星和地球提供了第一段返航座標。', questions: [{ a: 2, b: 3 }, { a: 5, b: 4 }, { a: 10, b: 3 }] },
+        { name: '日月交會星雲', worldTitle: '太陽與月亮', background: 0xfff0d7, foreground: '#8b6544', optionArt: ['sun', 'moon', 'comet'], goal: '用 3、4 的乘法校正太陽、月亮與彗星間的航線', checkpoint: '太陽與月亮幫太空人校正了航向。', questions: [{ a: 3, b: 6 }, { a: 4, b: 7 }, { a: 3, b: 8 }] },
+        { name: '隕石帶探險', worldTitle: '穿越隕石帶', background: 0xe7e9f7, foreground: '#5c6286', optionArt: ['asteroid', 'meteor', 'satellite'], goal: '熟練 6、7 的乘法，穿越隕石帶並接收衛星訊號', checkpoint: '太空人穿過隕石帶，衛星傳來了地球方向。', questions: [{ a: 6, b: 7 }, { a: 7, b: 8 }, { a: 6, b: 9 }] },
+        { name: '太空站補給航道', worldTitle: '太空站與火箭', background: 0xd8eef4, foreground: '#47727d', optionArt: ['rocket', 'shuttle', 'station'], goal: '用 8、9 的乘法在太空站補給，準備最後返航', checkpoint: '太空站補足了燃料，最後一段航程即將開始。', questions: [{ a: 8, b: 8 }, { a: 9, b: 6 }, { a: 9, b: 7 }] },
+        { name: '銀河核心', worldTitle: '銀河核心入口', background: 0x282c53, foreground: '#f5e7ad', optionArt: ['galaxy', 'portal', 'blackhole'], goal: '運用 11、12 倍穿過銀河核心，找到地球', questions: [{ a: 11, b: 8 }, { a: 12, b: 7 }, { a: 12, b: 9 }] }
       ];
       const totalQuestions = stages.reduce((sum, stage) => sum + stage.questions.length, 0);
       const ui = {
@@ -177,6 +180,7 @@
         stage: document.getElementById('stage-stat'),
         round: document.getElementById('round-stat'),
         score: document.getElementById('score-stat'),
+        lives: document.getElementById('life-stat'),
         progressLabel: document.getElementById('progress-label'),
         progressFill: document.getElementById('progress-fill'),
         overlay: document.getElementById('result-overlay'),
@@ -198,8 +202,10 @@
           this.stageIndex = 0;
           this.questionIndex = 0;
           this.score = 0;
+          this.lives = 3;
           this.solved = 0;
           this.acceptingAnswer = true;
+          this.awaitingStart = true;
           this.awaitingStage = false;
           this.moveTarget = null;
           this.targets = [];
@@ -208,8 +214,8 @@
         }
 
         create() {
-          this.drawIsland();
           this.makeTextures();
+          this.drawStageWorld();
           this.physics.world.setBounds(42, 38, 876, 364);
           this.player = this.physics.add.sprite(480, 365, 'explorer');
           this.player.setCollideWorldBounds(true);
@@ -223,47 +229,85 @@
               y: Phaser.Math.Clamp(pointer.worldY, 38, 402)
             };
           });
-          this.spawnQuestion();
+          this.spawnQuestion({ gracePeriod: true });
+          this.showIntro();
         }
 
-        drawIsland() {
-          const g = this.add.graphics();
-          g.fillStyle(0xdff5ec, 1).fillRoundedRect(18, 17, 924, 406, 25);
-          g.lineStyle(2, 0xc4e5d8, 1).strokeRoundedRect(18, 17, 924, 406, 25);
-          // Soft islands, flower patches and drifting stars add landmarks without blocking movement.
-          const islands = [
-            [100, 78, 57, 25, 0xc7eadb], [853, 85, 64, 28, 0xc8ebdc],
-            [83, 345, 52, 24, 0xc9ecdc], [880, 343, 65, 29, 0xc7eadb],
-            [293, 63, 35, 15, 0xd1efe2], [675, 374, 42, 18, 0xd1efe2]
-          ];
-          islands.forEach(([x, y, rx, ry, color]) => {
-            g.fillStyle(color, 1).fillEllipse(x, y, rx * 2, ry * 2);
-            g.fillStyle(0x91cdae, .75).fillCircle(x - rx * .38, y + 3, 4);
-            g.fillStyle(0x91cdae, .75).fillCircle(x + rx * .25, y - 2, 3);
-          });
-          // Dotted trail marks the island path.
-          g.fillStyle(0xffffff, .68);
-          [[205,94],[243,99],[281,103],[319,106],[642,97],[679,92],[716,89],
-           [185,342],[220,350],[255,356],[705,352],[741,346],[777,340]].forEach(([x,y]) => g.fillCircle(x,y,3));
-          // Tiny four-point stars.
-          [[150,151],[811,271],[315,317],[620,152],[440,86],[543,352]].forEach(([x,y], i) => {
-            const color = i % 2 ? 0xf6c65b : 0x78bdae;
-            g.fillStyle(color, .82);
-            g.fillPoints([
-              new Phaser.Geom.Point(x, y - 8), new Phaser.Geom.Point(x + 2, y - 2),
-              new Phaser.Geom.Point(x + 8, y), new Phaser.Geom.Point(x + 2, y + 2),
-              new Phaser.Geom.Point(x, y + 8), new Phaser.Geom.Point(x - 2, y + 2),
-              new Phaser.Geom.Point(x - 8, y), new Phaser.Geom.Point(x - 2, y - 2)
-            ], true);
-          });
-          // Bottom-edge shrubs frame the play space.
-          [[361,400],[379,397],[398,401],[565,401],[583,396],[602,400]].forEach(([x,y], i) => {
-            g.fillStyle(i % 2 ? 0x68b996 : 0x83caa7, 1).fillCircle(x,y,8);
-          });
-          g.destroy();
-          this.add.text(38, 27, '✦ 星島探險區', {
-            fontFamily: 'system-ui, sans-serif', fontSize: '12px', fontStyle: 'bold', color: '#537b70'
-          }).setDepth(3);
+        drawStageWorld() {
+          const stage = stages[this.stageIndex];
+          const g = this.worldGraphics || this.add.graphics().setDepth(0);
+          this.worldGraphics = g;
+          g.clear();
+          g.fillStyle(stage.background, 1).fillRoundedRect(18, 17, 924, 406, 25);
+          g.lineStyle(2, this.stageIndex === 4 ? 0x777ab0 : 0xffffff, .75).strokeRoundedRect(18, 17, 924, 406, 25);
+          this.cameras.main.setBackgroundColor(stage.background);
+
+          if (this.stageIndex === 0) {
+            g.fillStyle(0xc7eadb, 1).fillEllipse(100, 83, 118, 50).fillEllipse(853, 86, 130, 54);
+            g.lineStyle(5, 0xe3ad48, .9).strokeEllipse(100, 82, 94, 31);
+            g.fillStyle(0xe75f50, 1).fillCircle(853, 84, 25);
+            g.fillStyle(0xffba8d, 1).fillCircle(846, 76, 5).fillCircle(863, 90, 7);
+            g.fillStyle(0xc9ecdc, 1).fillEllipse(83, 347, 100, 45).fillEllipse(880, 344, 124, 52);
+            g.fillStyle(0xf5ca73, .75).fillCircle(75, 341, 4).fillCircle(895, 349, 4);
+          } else if (this.stageIndex === 1) {
+            for (let i = 0; i < 12; i++) {
+              const angle = i * Math.PI / 6;
+              const x1 = 91 + Math.cos(angle) * 35;
+              const y1 = 82 + Math.sin(angle) * 35;
+              const x2 = 91 + Math.cos(angle) * 46;
+              const y2 = 82 + Math.sin(angle) * 46;
+              g.lineStyle(5, 0xf3b845, .85).beginPath().moveTo(x1, y1).lineTo(x2, y2).strokePath();
+            }
+            g.fillStyle(0xffc94f, 1).fillCircle(91, 82, 31);
+            g.fillStyle(0xffe99b, 1).fillCircle(81, 72, 9);
+            g.fillStyle(0xbac6d4, 1).fillCircle(860, 83, 31);
+            g.fillStyle(0xe7edf0, .9).fillCircle(849, 74, 8).fillCircle(871, 91, 5).fillCircle(850, 98, 4);
+            g.lineStyle(2, 0xd2b16c, .55).strokeEllipse(480, 207, 780, 300);
+          } else if (this.stageIndex === 2) {
+            [[88,85,22],[855,93,18],[82,332,15],[882,349,24],[277,72,10],[685,378,12]].forEach(([x,y,r], i) => {
+              g.fillStyle(i % 2 ? 0x9097ad : 0xb6a8b2, .72).fillCircle(x, y, r);
+              g.fillStyle(0x70788e, .4).fillCircle(x - r * .25, y - 2, r * .25).fillCircle(x + r * .3, y + r * .28, r * .18);
+            });
+            g.lineStyle(2, 0xffffff, .6).beginPath().moveTo(55, 177).lineTo(97, 164).strokePath();
+            g.lineStyle(2, 0xffffff, .6).beginPath().moveTo(850, 263).lineTo(900, 251).strokePath();
+          } else if (this.stageIndex === 3) {
+            g.fillStyle(0x7da9ba, .85).fillRoundedRect(42, 71, 73, 17, 5).fillRoundedRect(845, 333, 73, 17, 5);
+            g.fillStyle(0x4f8193, .9).fillRoundedRect(75, 62, 34, 36, 8).fillRoundedRect(869, 323, 34, 36, 8);
+            g.lineStyle(2, 0xeffbff, .75).strokeRoundedRect(42, 71, 73, 17, 5).strokeRoundedRect(845, 333, 73, 17, 5);
+            g.lineStyle(2, 0xeffbff, .65).beginPath().moveTo(55, 71).lineTo(55, 88).moveTo(72, 71).lineTo(72, 88).moveTo(91, 71).lineTo(91, 88).strokePath();
+            g.fillStyle(0xffffff, .7).fillCircle(131, 83, 3).fillCircle(820, 349, 3).fillCircle(270, 72, 3).fillCircle(688, 374, 3);
+          } else {
+            g.fillStyle(0x57477f, .45).fillEllipse(480, 220, 560, 360);
+            g.lineStyle(12, 0x7664bb, .35).strokeEllipse(480, 219, 620, 346);
+            g.lineStyle(3, 0xa695ed, .5).strokeEllipse(480, 219, 750, 390);
+            [[75,82],[884,82],[82,350],[886,351],[284,72],[680,376],[790,143],[168,293]].forEach(([x,y], i) => {
+              g.fillStyle(i % 2 ? 0xf6d47a : 0xffffff, .8).fillCircle(x, y, i % 3 ? 3 : 5);
+            });
+          }
+
+          if (!this.worldTitle) {
+            this.worldTitle = this.add.text(38, 27, '', {
+              fontFamily: 'system-ui, sans-serif', fontSize: '12px', fontStyle: 'bold'
+            }).setDepth(3);
+          }
+          this.worldTitle.setText(`✦ ${stage.worldTitle}`).setColor(stage.foreground);
+        }
+
+        showIntro() {
+          this.acceptingAnswer = false;
+          ui.resultIcon.textContent = '🧑‍🚀';
+          ui.resultTitle.textContent = '太空人迷航了！';
+          ui.finalScore.textContent = '太空人不小心脫離軌道，找不到回地球的路。解開五關乘法任務，幫他拼回返航路線。答對 +10 分，答錯 −5 分並消耗一次救援機會。答錯三次，外星人就會抓走他吃掉！';
+          ui.restart.textContent = '開始尋找回家的路';
+          ui.overlay.hidden = false;
+        }
+
+        startGame() {
+          if (!this.awaitingStart) return;
+          this.awaitingStart = false;
+          this.acceptingAnswer = true;
+          ui.overlay.hidden = true;
+          this.addToast('返航任務開始！先掃描行星座標。', '#167d78', 1200);
         }
 
         makeTextures() {
@@ -299,30 +343,116 @@
           hero.generateTexture('explorer', 72, 84);
           hero.destroy();
 
-          const planets = [
-            { key: 'answer-planet-0', base: 0x4da9d2, land: 0x83d6ad, accent: 0xffd36e },
-            { key: 'answer-planet-1', base: 0xe77f69, land: 0xffc17b, accent: 0xffe8a0 },
-            { key: 'answer-planet-2', base: 0x887bd1, land: 0xc3a5ed, accent: 0x76d8cb }
-          ];
-          planets.forEach((planet, index) => {
-            const g = this.make.graphics({ x: 0, y: 0, add: false });
-            // A broad orbit and shadow make each answer read as a planet at a glance.
-            g.lineStyle(5, planet.accent, .9).strokeEllipse(64, 66, 118, 44);
-            g.fillStyle(0x315c69, .2).fillEllipse(64, 82, 86, 16);
-            g.fillStyle(planet.base, 1).fillCircle(64, 62, 48);
-            g.lineStyle(3, 0xffffff, .75).strokeCircle(64, 62, 45);
-            if (index === 0) {
-              g.fillStyle(planet.land, .95).fillEllipse(48, 47, 23, 17).fillEllipse(75, 73, 19, 13).fillEllipse(78, 42, 12, 9);
-            } else if (index === 1) {
-              g.fillStyle(planet.land, .95).fillEllipse(49, 43, 32, 13).fillEllipse(71, 59, 37, 12).fillEllipse(53, 76, 30, 10);
-            } else {
-              g.fillStyle(planet.land, .95).fillEllipse(47, 51, 20, 18).fillEllipse(72, 45, 17, 12).fillEllipse(69, 73, 25, 11);
-            }
-            g.fillStyle(planet.accent, .82).fillCircle(39, 65, 4).fillCircle(83, 61, 3);
-            g.fillStyle(0xffffff, .6).fillEllipse(49, 30, 20, 7);
-            g.generateTexture(planet.key, 128, 128);
-            g.destroy();
+          stages.forEach((stage, stageIndex) => {
+            stage.optionArt.forEach((art, choiceIndex) => this.makeChoiceTexture(stageIndex, choiceIndex, art));
           });
+        }
+
+        makeChoiceTexture(stageIndex, choiceIndex, art) {
+          const g = this.make.graphics({ x: 0, y: 0, add: false });
+          const key = `choice-${stageIndex}-${choiceIndex}`;
+          const points = (coordinates) => coordinates.map(([x,y]) => new Phaser.Geom.Point(x,y));
+          g.fillStyle(0x17344a, .16).fillEllipse(64, 91, 83, 15);
+
+          if (art === 'saturn') {
+            g.lineStyle(8, 0xd8a64c, .95).strokeEllipse(64, 65, 120, 43);
+            g.fillStyle(0xe4b969, 1).fillCircle(64, 62, 39);
+            g.fillStyle(0xf5d796, 1).fillEllipse(64, 50, 65, 10).fillEllipse(64, 67, 76, 9);
+            g.lineStyle(3, 0xffffff, .75).strokeCircle(64, 62, 37);
+          } else if (art === 'mars') {
+            g.fillStyle(0xc95042, 1).fillCircle(64, 62, 45);
+            g.lineStyle(3, 0xffffff, .8).strokeCircle(64, 62, 43);
+            g.fillStyle(0xf08362, .95).fillEllipse(47, 44, 24, 14).fillEllipse(74, 73, 20, 12);
+            g.lineStyle(3, 0x9d3f39, .8).strokeCircle(46, 67, 8).strokeCircle(79, 50, 6).strokeCircle(64, 82, 5);
+          } else if (art === 'earth') {
+            g.fillStyle(0x398fce, 1).fillCircle(64, 62, 45);
+            g.lineStyle(3, 0xffffff, .8).strokeCircle(64, 62, 43);
+            g.fillStyle(0x75c780, 1).fillEllipse(47, 49, 27, 22).fillEllipse(73, 70, 25, 19).fillEllipse(80, 42, 13, 10);
+            g.fillStyle(0xcdf4ff, .9).fillEllipse(48, 31, 21, 7);
+          } else if (art === 'sun') {
+            for (let i = 0; i < 12; i++) {
+              const angle = i * Math.PI / 6;
+              g.fillStyle(0xf4a934, 1).fillPoints([
+                new Phaser.Geom.Point(64 + Math.cos(angle - .12) * 35, 62 + Math.sin(angle - .12) * 35),
+                new Phaser.Geom.Point(64 + Math.cos(angle) * 56, 62 + Math.sin(angle) * 56),
+                new Phaser.Geom.Point(64 + Math.cos(angle + .12) * 35, 62 + Math.sin(angle + .12) * 35)
+              ], true);
+            }
+            g.fillStyle(0xffc94e, 1).fillCircle(64, 62, 39);
+            g.fillStyle(0xffe889, 1).fillCircle(51, 47, 12);
+            g.lineStyle(3, 0xffffff, .75).strokeCircle(64, 62, 37);
+          } else if (art === 'moon') {
+            g.fillStyle(0xc5ced9, 1).fillCircle(64, 62, 45);
+            g.fillStyle(0x9eaaba, .9).fillCircle(48, 52, 9).fillCircle(76, 70, 12).fillCircle(76, 43, 6);
+            g.lineStyle(3, 0xffffff, .8).strokeCircle(64, 62, 43);
+            g.lineStyle(2, 0xe8edf2, .85).strokeCircle(48, 52, 9).strokeCircle(76, 70, 12);
+          } else if (art === 'comet') {
+            g.fillStyle(0x90d8ec, .78).fillPoints([new Phaser.Geom.Point(7, 31), new Phaser.Geom.Point(74, 49), new Phaser.Geom.Point(76, 75), new Phaser.Geom.Point(7, 94)], true);
+            g.fillStyle(0x4a9bc0, .75).fillPoints([new Phaser.Geom.Point(18, 45), new Phaser.Geom.Point(72, 55), new Phaser.Geom.Point(72, 69), new Phaser.Geom.Point(18, 81)], true);
+            g.fillStyle(0x587d9a, 1).fillCircle(76, 62, 26);
+            g.fillStyle(0xb2dce8, 1).fillCircle(68, 51, 8).fillCircle(86, 70, 6);
+            g.lineStyle(3, 0xffffff, .8).strokeCircle(76, 62, 24);
+          } else if (art === 'asteroid') {
+            const boulder = [[29,36],[53,18],[82,26],[103,48],[96,79],[72,103],[39,91],[21,65]].map(([x,y]) => new Phaser.Geom.Point(x,y));
+            g.fillStyle(0x8c8498, 1).fillPoints(boulder, true);
+            g.lineStyle(3, 0xffffff, .72).strokePoints(boulder, true);
+            g.fillStyle(0x66657d, .9).fillCircle(47, 52, 9).fillCircle(76, 72, 12).fillCircle(76, 42, 5);
+            g.lineStyle(2, 0xbdb6c7, .75).strokeCircle(47, 52, 9).strokeCircle(76, 72, 12);
+          } else if (art === 'meteor') {
+            g.fillStyle(0xffbd5a, .9).fillPoints(points([[7,62],[67,38],[82,48],[77,75],[67,85]]), true);
+            g.fillStyle(0xf17952, .9).fillPoints(points([[17,62],[70,48],[84,59],[76,71]]), true);
+            g.fillStyle(0x687b98, 1).fillCircle(81, 62, 24);
+            g.fillStyle(0xb6c2d4, 1).fillCircle(74, 54, 7).fillCircle(89, 69, 5);
+            g.lineStyle(3, 0xffffff, .8).strokeCircle(81, 62, 22);
+          } else if (art === 'satellite') {
+            g.fillStyle(0x417ca0, 1).fillRoundedRect(48, 43, 32, 38, 7);
+            g.fillStyle(0x6ab0c9, 1).fillRect(7, 47, 36, 30).fillRect(85, 47, 36, 30);
+            g.lineStyle(2, 0xd8f6ff, .9).strokeRect(7, 47, 36, 30).strokeRect(85, 47, 36, 30);
+            [18,29,96,107].forEach((x) => g.lineStyle(1, 0xd8f6ff, .75).beginPath().moveTo(x, 48).lineTo(x, 76).strokePath());
+            g.fillStyle(0xffd36e, 1).fillCircle(64, 62, 8);
+            g.lineStyle(3, 0xffffff, .8).strokeRoundedRect(48, 43, 32, 38, 7);
+          } else if (art === 'rocket') {
+            const rocketShape = points([[64,9],[88,57],[82,84],[46,84],[40,57]]);
+            g.fillStyle(0x72bcd0, 1).fillPoints(rocketShape, true);
+            g.fillStyle(0xf17762, 1).fillPoints(points([[42,58],[23,87],[49,78]]), true).fillPoints(points([[86,58],[105,87],[79,78]]), true);
+            g.fillStyle(0xffd36e, 1).fillPoints(points([[52,82],[64,112],[76,82]]), true);
+            g.fillStyle(0x456884, 1).fillCircle(64, 48, 12);
+            g.lineStyle(3, 0xffffff, .9).strokeCircle(64, 48, 12).strokePoints(rocketShape, true);
+          } else if (art === 'shuttle') {
+            const shuttleShape = points([[64,11],[78,47],[111,79],[79,73],[70,103],[58,103],[49,73],[17,79],[50,47]]);
+            g.fillStyle(0xe8eff2, 1).fillPoints(shuttleShape, true);
+            g.fillStyle(0x64b7d0, 1).fillEllipse(64, 49, 15, 24);
+            g.fillStyle(0xf07b62, 1).fillPoints(points([[58,101],[64,119],[70,101]]), true);
+            g.lineStyle(3, 0x607d93, .9).strokePoints(shuttleShape, true);
+          } else if (art === 'station') {
+            g.fillStyle(0x5c8799, 1).fillRoundedRect(49, 42, 30, 42, 7).fillRoundedRect(57, 27, 14, 70, 5);
+            g.fillStyle(0x72b6ca, 1).fillRect(5, 49, 39, 29).fillRect(84, 49, 39, 29);
+            g.lineStyle(2, 0xe0f7ff, .9).strokeRect(5, 49, 39, 29).strokeRect(84, 49, 39, 29);
+            [17,29,96,108].forEach((x) => g.lineStyle(1, 0xe0f7ff, .7).beginPath().moveTo(x, 50).lineTo(x, 77).strokePath());
+            g.fillStyle(0xffd36e, 1).fillCircle(64, 62, 5);
+            g.lineStyle(3, 0xffffff, .8).strokeRoundedRect(49, 42, 30, 42, 7);
+          } else if (art === 'galaxy') {
+            g.fillStyle(0x564b9b, 1).fillCircle(64, 62, 45);
+            g.lineStyle(7, 0xc08ee9, .9).strokeEllipse(64, 62, 88, 38);
+            g.lineStyle(3, 0xf2c5ff, .9).strokeEllipse(64, 62, 68, 24);
+            g.fillStyle(0xffe69a, 1).fillCircle(64, 62, 13);
+            [[37,56],[87,67],[71,43],[48,81]].forEach(([x,y]) => g.fillStyle(0xffffff, .9).fillCircle(x,y,3));
+          } else if (art === 'portal') {
+            g.fillStyle(0x4c4d9b, 1).fillCircle(64, 62, 47);
+            g.lineStyle(9, 0x78d8d2, .95).strokeEllipse(64, 62, 90, 78);
+            g.lineStyle(5, 0xb59af2, .95).strokeEllipse(64, 62, 67, 59);
+            g.lineStyle(3, 0xf4d7ff, .95).strokeEllipse(64, 62, 42, 37);
+            g.fillStyle(0x25325c, 1).fillCircle(64, 62, 15);
+          } else if (art === 'blackhole') {
+            g.lineStyle(10, 0xf18b73, .8).strokeEllipse(64, 62, 106, 34);
+            g.lineStyle(5, 0xffd36e, .95).strokeEllipse(64, 62, 84, 25);
+            g.fillStyle(0x17192f, 1).fillCircle(64, 62, 30);
+            g.lineStyle(3, 0xb69cf0, .9).strokeCircle(64, 62, 30);
+            g.fillStyle(0xffffff, .85).fillCircle(54, 48, 4);
+          }
+
+          g.generateTexture(key, 128, 128);
+          g.destroy();
         }
 
         spawnQuestion({ gracePeriod = false } = {}) {
@@ -342,7 +472,7 @@
           this.addToast(gracePeriod ? '準備下一題…' : `完成 ${stage.name} 的乘法任務！找出 ${answer}`, '#18334b', gracePeriod ? 800 : 900);
           choices.forEach((value, index) => {
             const [x, y] = anchors[index];
-            const orb = this.physics.add.sprite(x, y, `answer-planet-${index}`);
+            const orb = this.physics.add.sprite(x, y, `choice-${this.stageIndex}-${index}`);
             orb.body.setCircle(44, 20, 20);
             orb.setImmovable(true);
             orb.setData('answer', value);
@@ -362,7 +492,7 @@
           });
           if (gracePeriod) {
             this.time.delayedCall(800, () => {
-              if (!this.scene.isActive() || this.stageIndex >= stages.length || this.acceptingAnswer) return;
+              if (!this.scene.isActive() || this.stageIndex >= stages.length || this.acceptingAnswer || this.awaitingStart || this.awaitingStage) return;
               this.acceptingAnswer = true;
               this.addToast(`尋找 ${answer}！`, '#18334b', 650);
             });
@@ -393,8 +523,13 @@
             this.tweens.add({ targets: [orb, label], scale: 1.45, alpha: 0, duration: 280, ease: 'Back.easeIn', onComplete: () => this.advance() });
           } else {
             this.score -= 5;
+            this.lives -= 1;
             this.updateUI();
-            this.addToast(`再試一次！ −5 分　${q.a} 組、每組 ${q.b} 個，共 ${answer}`, '#b64f46', 1750);
+            if (this.lives === 0) {
+              this.failGame();
+              return;
+            }
+            this.addToast(`答錯了！ −5 分，剩下 ${this.lives} 次救援機會　${q.a} 組、每組 ${q.b} 個，共 ${answer}`, '#b64f46', 1750);
             this.tweens.add({
               targets: [orb, label], scale: .6, alpha: 0, duration: 250,
               onComplete: () => { orb.destroy(); label.destroy(); }
@@ -423,7 +558,7 @@
           this.player.setPosition(480, 365).setVelocity(0, 0);
           ui.resultIcon.textContent = '✦';
           ui.resultTitle.textContent = `第 ${this.stageIndex + 1} 關完成！`;
-          ui.finalScore.textContent = `${completed.name}通關。${completed.goal}。下一站：${next.name}，挑戰會再提高。`;
+          ui.finalScore.textContent = `${completed.checkpoint} 下一站：${next.name}。${next.goal}。`;
           ui.restart.textContent = `前往第 ${this.stageIndex + 2} 關`;
           ui.overlay.hidden = false;
         }
@@ -434,6 +569,7 @@
           this.stageIndex += 1;
           this.questionIndex = 0;
           ui.overlay.hidden = true;
+          this.drawStageWorld();
           this.spawnQuestion({ gracePeriod: true });
         }
 
@@ -466,23 +602,25 @@
             ui.round.textContent = `${this.questionIndex + 1} / ${stage.questions.length}`;
           }
           ui.score.textContent = String(this.score);
-          ui.progressLabel.textContent = `星球探索 ${this.solved} / ${totalQuestions} 題`;
+          ui.lives.textContent = String(this.lives);
+          ui.progressLabel.textContent = `星際探索 ${this.solved} / ${totalQuestions} 題`;
           ui.progressFill.style.width = `${(this.solved / totalQuestions) * 100}%`;
         }
 
         finishGame() {
           this.acceptingAnswer = false;
+          this.awaitingStart = false;
           this.awaitingStage = false;
           this.clearTargets();
           this.player.setVelocity(0, 0);
-          ui.question.innerHTML = '任務完成 <span class="equals">✦</span>';
-          ui.questionLabel.textContent = '乘法星球探險隊・全關通過';
-          ui.stageGoal.textContent = '你已完成由基礎倍數到綜合乘法的五階段挑戰';
+          ui.question.innerHTML = '回到地球 <span class="equals">✦</span>';
+          ui.questionLabel.textContent = '返航成功・太空人平安回家';
+          ui.stageGoal.textContent = '五關乘法任務全數完成，太空人終於回到地球！';
           ui.stage.textContent = '5 / 5';
           ui.round.textContent = '15 / 15';
           ui.resultIcon.textContent = '🏆';
-          ui.resultTitle.textContent = '星際任務完成！';
-          ui.finalScore.textContent = `你完成了 5 個關卡、15 道乘法題，得到 ${this.score} 分！`;
+          ui.resultTitle.textContent = '太空人成功回家！';
+          ui.finalScore.textContent = `你完成五關、解開 15 道乘法題，帶太空人平安回到地球，得到 ${this.score} 分！`;
           ui.restart.textContent = '再玩一次';
           ui.overlay.hidden = false;
           this.addToast('太厲害了！全關完成！', '#167d78', 2000);
@@ -492,12 +630,34 @@
           this.stageIndex = 0;
           this.questionIndex = 0;
           this.score = 0;
+          this.lives = 3;
           this.solved = 0;
+          this.awaitingStart = false;
           this.awaitingStage = false;
           this.moveTarget = null;
           this.player.setPosition(480, 365).setVelocity(0, 0);
           ui.overlay.hidden = true;
+          this.drawStageWorld();
           this.spawnQuestion();
+        }
+
+        failGame() {
+          this.acceptingAnswer = false;
+          this.awaitingStart = false;
+          this.awaitingStage = false;
+          this.moveTarget = null;
+          this.clearTargets();
+          this.player.setVelocity(0, 0);
+          ui.question.innerHTML = '返航中斷 <span class="unknown">!</span>';
+          ui.questionLabel.textContent = '救援機會已用完';
+          ui.stageGoal.textContent = '再試一次，用乘法替太空人找回家的路';
+          ui.resultIcon.textContent = '👾';
+          ui.resultTitle.textContent = '糟糕！太空人被抓走了';
+          ui.finalScore.textContent = `救援機會用完，外星人把太空人抓走吃掉了。本次得到 ${this.score} 分。再挑戰一次，幫他回到地球！`;
+          ui.restart.textContent = '再試一次';
+          ui.lives.textContent = '0';
+          ui.overlay.hidden = false;
+          this.addToast('外星飛船攔截了返航路線！', '#a34052', 1800);
         }
 
         update(time) {
@@ -546,7 +706,8 @@
       ui.restart.addEventListener('click', () => {
         const scene = game.scene.getScene('StarIsland');
         if (!scene || !scene.scene.isActive()) return;
-        if (scene.awaitingStage) scene.continueStage();
+        if (scene.awaitingStart) scene.startGame();
+        else if (scene.awaitingStage) scene.continueStage();
         else scene.restartGame();
       });
     })();
