@@ -218,6 +218,79 @@
       background: #edf1eb;
     }
 
+    .mechanism-layout {
+      display: grid;
+      grid-template-columns: 218px minmax(0, 1fr);
+      align-items: start;
+      gap: 18px;
+    }
+
+    .mechanism-index {
+      position: sticky;
+      top: 16px;
+      padding: 18px 14px;
+      border: 1px solid #dce4dc;
+      border-radius: 18px;
+      background: #fffefa;
+      box-shadow: 0 12px 34px #263e3510;
+    }
+
+    .mechanism-index h3 {
+      margin: 0 0 10px 4px;
+      color: var(--muted);
+      font-size: .78rem;
+      font-weight: 900;
+      letter-spacing: .08em;
+    }
+
+    .mechanism-index ol {
+      display: grid;
+      gap: 4px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .mechanism-index a {
+      display: grid;
+      grid-template-columns: 30px minmax(0, 1fr);
+      align-items: center;
+      gap: 8px;
+      min-height: 37px;
+      padding: 5px 7px;
+      border-radius: 10px;
+      color: #41585e;
+      font-size: .87rem;
+      font-weight: 800;
+      text-decoration: none;
+      transition: color .15s ease, background .15s ease;
+    }
+
+    .mechanism-index a:hover,
+    .mechanism-index a:focus-visible {
+      color: #105a56;
+      background: #e8f3ed;
+    }
+
+    .index-number {
+      display: grid;
+      width: 28px;
+      height: 28px;
+      place-items: center;
+      border-radius: 9px;
+      color: #7a4b10;
+      background: #fff0c7;
+      font-size: .75rem;
+      font-weight: 900;
+    }
+
+    .mechanism-card[id] { scroll-margin-top: 18px; }
+
+    .mechanism-layout > .row {
+      margin-inline: 0;
+      --bs-gutter-x: 1rem;
+    }
+
     .mechanism-card {
       height: 100%;
       overflow: hidden;
@@ -371,6 +444,22 @@
     }
 
     @media (max-width: 767.98px) {
+      .mechanism-layout {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 18px;
+      }
+
+      .mechanism-index {
+        position: static;
+        padding: 14px;
+      }
+
+      .mechanism-index ol {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .mechanism-index a { font-size: .82rem; }
+
       .learning-loop {
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }
@@ -385,6 +474,8 @@
     }
 
     @media (max-width: 420px) {
+      .mechanism-index ol { grid-template-columns: 1fr; }
+
       .learning-loop {
         grid-template-columns: 1fr;
       }
@@ -452,9 +543,26 @@
         <h2 class="section-title">十種適合帶進課堂的遊戲機制</h2>
         <p class="section-intro mb-5">十個範例都使用太空人解乘法題、蒐集返航座標的同一玩法核心，但每個遊戲各自加入不同規則。你可以直接操作，也能把任一遊戲切換成全螢幕。</p>
 
+        <div class="mechanism-layout">
+          <nav class="mechanism-index" aria-label="十種機制快速前往">
+            <h3>快速前往</h3>
+            <ol>
+              <li><a href="#mechanism-01"><span class="index-number">01</span><span>任務目標</span></a></li>
+              <li><a href="#mechanism-02"><span class="index-number">02</span><span>點數與獎勵</span></a></li>
+              <li><a href="#mechanism-03"><span class="index-number">03</span><span>即時回饋</span></a></li>
+              <li><a href="#mechanism-04"><span class="index-number">04</span><span>記憶提取</span></a></li>
+              <li><a href="#mechanism-05"><span class="index-number">05</span><span>限時挑戰</span></a></li>
+              <li><a href="#mechanism-06"><span class="index-number">06</span><span>風險與選擇</span></a></li>
+              <li><a href="#mechanism-07"><span class="index-number">07</span><span>生命與再次嘗試</span></a></li>
+              <li><a href="#mechanism-08"><span class="index-number">08</span><span>空間規劃</span></a></li>
+              <li><a href="#mechanism-09"><span class="index-number">09</span><span>線索推理</span></a></li>
+              <li><a href="#mechanism-10"><span class="index-number">10</span><span>漸進難度</span></a></li>
+            </ol>
+          </nav>
+
         <div class="row g-4">
           <div class="col-12 col-lg-6">
-            <article class="mechanism-card">
+            <article class="mechanism-card" id="mechanism-01">
               <div class="card-copy">
                 <span class="number-tag">01</span>
                 <h3>任務目標</h3>
@@ -468,7 +576,7 @@
           </div>
 
           <div class="col-12 col-lg-6">
-            <article class="mechanism-card">
+            <article class="mechanism-card" id="mechanism-02">
               <div class="card-copy">
                 <span class="number-tag">02</span>
                 <h3>點數與獎勵</h3>
@@ -482,7 +590,7 @@
           </div>
 
           <div class="col-12 col-lg-6">
-            <article class="mechanism-card">
+            <article class="mechanism-card" id="mechanism-03">
               <div class="card-copy">
                 <span class="number-tag">03</span>
                 <h3>即時回饋</h3>
@@ -496,7 +604,7 @@
           </div>
 
           <div class="col-12 col-lg-6">
-            <article class="mechanism-card">
+            <article class="mechanism-card" id="mechanism-04">
               <div class="card-copy">
                 <span class="number-tag">04</span>
                 <h3>記憶提取</h3>
@@ -510,7 +618,7 @@
           </div>
 
           <div class="col-12 col-lg-6">
-            <article class="mechanism-card">
+            <article class="mechanism-card" id="mechanism-05">
               <div class="card-copy">
                 <span class="number-tag">05</span>
                 <h3>限時挑戰</h3>
@@ -524,7 +632,7 @@
           </div>
 
           <div class="col-12 col-lg-6">
-            <article class="mechanism-card">
+            <article class="mechanism-card" id="mechanism-06">
               <div class="card-copy">
                 <span class="number-tag">06</span>
                 <h3>風險與選擇</h3>
@@ -538,7 +646,7 @@
           </div>
 
           <div class="col-12 col-lg-6">
-            <article class="mechanism-card">
+            <article class="mechanism-card" id="mechanism-07">
               <div class="card-copy">
                 <span class="number-tag">07</span>
                 <h3>生命與再次嘗試</h3>
@@ -552,7 +660,7 @@
           </div>
 
           <div class="col-12 col-lg-6">
-            <article class="mechanism-card">
+            <article class="mechanism-card" id="mechanism-08">
               <div class="card-copy">
                 <span class="number-tag">08</span>
                 <h3>空間規劃</h3>
@@ -566,7 +674,7 @@
           </div>
 
           <div class="col-12 col-lg-6">
-            <article class="mechanism-card">
+            <article class="mechanism-card" id="mechanism-09">
               <div class="card-copy">
                 <span class="number-tag">09</span>
                 <h3>線索推理</h3>
@@ -580,7 +688,7 @@
           </div>
 
           <div class="col-12 col-lg-6">
-            <article class="mechanism-card">
+            <article class="mechanism-card" id="mechanism-10">
               <div class="card-copy">
                 <span class="number-tag">10</span>
                 <h3>漸進難度</h3>
@@ -592,6 +700,7 @@
               <iframe class="game-embed" id="game-progression" title="漸進難度機制的乘法星球遊戲" src="./index.html?embed=1&amp;mechanic=progression" loading="lazy" allow="fullscreen" allowfullscreen></iframe>
             </article>
           </div>
+        </div>
         </div>
       </div>
     </section>
