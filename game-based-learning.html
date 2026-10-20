@@ -288,29 +288,45 @@
       white-space: nowrap;
     }
 
-    .demo-stage {
+    .game-embed {
       display: block;
       width: 100%;
       aspect-ratio: 16 / 9;
-      overflow: hidden;
+      border: 0;
       background: #e7f3ed;
-      touch-action: none;
+      touch-action: manipulation;
     }
 
-    .demo-stage canvas {
-      display: block;
-      width: 100%;
-      height: 100%;
+    .game-embed:fullscreen {
+      width: 100vw;
+      height: 100vh;
+      aspect-ratio: auto;
+      background: #fffdf7;
     }
 
-    .demo-status {
-      min-height: 42px;
-      margin: 0;
-      padding: 10px 16px;
-      color: #50656b;
-      background: #fbfcf7;
-      font-size: .85rem;
-      line-height: 1.5;
+    .fullscreen-button {
+      flex: 0 0 auto;
+      border: 1px solid #c7d8d0;
+      border-radius: 999px;
+      padding: 6px 10px;
+      color: var(--teal);
+      background: white;
+      font: inherit;
+      font-size: .78rem;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .fullscreen-button:hover,
+    .fullscreen-button:focus-visible {
+      color: white;
+      background: var(--teal);
+    }
+
+    .frame-heading span:first-child {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     .sources {
@@ -363,8 +379,8 @@
         min-height: 0;
       }
 
-      .demo-stage {
-        min-height: 205px;
+      .game-embed {
+        min-height: 190px;
       }
     }
 
@@ -434,7 +450,7 @@
       <div class="container">
         <p class="section-kicker">TEN MECHANICS TO TRY</p>
         <h2 class="section-title">十種適合帶進課堂的遊戲機制</h2>
-        <p class="section-intro mb-5">每個範例都可以在下方直接操作。想像如何把課程內容換成任務、道具、線索或挑戰，再把學生的選擇接回學習目標。</p>
+        <p class="section-intro mb-5">十個範例都使用太空人解乘法題、蒐集返航座標的同一玩法核心，但每個遊戲各自加入不同規則。你可以直接操作，也能把任一遊戲切換成全螢幕。</p>
 
         <div class="row g-4">
           <div class="col-12 col-lg-6">
@@ -444,11 +460,10 @@
                 <h3>任務目標</h3>
                 <p>清楚的任務讓學生知道要完成什麼，也能把抽象學習目標轉成看得見的行動。</p>
                 <p class="classroom-link"><strong>課堂連結</strong> 把題目設計成收集物，完成指定題數才能抵達終點。</p>
-                <p>Phaser 操作體驗 收集三顆星星，完成任務後抵達終點。</p>
+                <p>返家任務分成五個航段，每關解開三道乘法題來取得座標。</p>
               </div>
-              <div class="frame-heading"><span>Phaser 可操作體驗</span><span>點擊星星與終點</span></div>
-              <div class="demo-stage" data-demo="mission" role="group" aria-label="收集星星完成任務的 Phaser 遊戲"></div>
-              <p class="demo-status" aria-live="polite">遊戲載入中</p>
+              <div class="frame-heading"><span>任務目標　逐段蒐集返航座標</span><button class="fullscreen-button" type="button" data-fullscreen-for="game-mission">全螢幕</button></div>
+              <iframe class="game-embed" id="game-mission" title="任務目標機制的乘法星球遊戲" src="./index.html?embed=1&amp;mechanic=mission" loading="lazy" allow="fullscreen" allowfullscreen></iframe>
             </article>
           </div>
 
@@ -459,11 +474,10 @@
                 <h3>點數與獎勵</h3>
                 <p>獎勵能讓進展變得可見。分數也能記錄努力、策略或知識應用，不必只獎勵速度。</p>
                 <p class="classroom-link"><strong>課堂連結</strong> 答對得星星，說出解題理由再取得額外獎勵。</p>
-                <p>Phaser 操作體驗 點擊金幣，在時間內累積獎勵分數。</p>
+                <p>答對累積探險分數，連續答對三題再取得星塵徽章和額外獎勵。</p>
               </div>
-              <div class="frame-heading"><span>Phaser 可操作體驗</span><span>開始後點擊金幣</span></div>
-              <div class="demo-stage" data-demo="reward" role="group" aria-label="限時點擊金幣累積分數的 Phaser 遊戲"></div>
-              <p class="demo-status" aria-live="polite">遊戲載入中</p>
+              <div class="frame-heading"><span>點數與獎勵　累積分數與星塵徽章</span><button class="fullscreen-button" type="button" data-fullscreen-for="game-reward">全螢幕</button></div>
+              <iframe class="game-embed" id="game-reward" title="點數與獎勵機制的乘法星球遊戲" src="./index.html?embed=1&amp;mechanic=reward" loading="lazy" allow="fullscreen" allowfullscreen></iframe>
             </article>
           </div>
 
@@ -474,11 +488,10 @@
                 <h3>即時回饋</h3>
                 <p>讓學生立即看到行動的結果，並知道下一步可以如何調整，錯誤也就成為修正策略的線索。</p>
                 <p class="classroom-link"><strong>課堂連結</strong> 回答後顯示解題提示，讓學生說明錯在哪一步。</p>
-                <p>Phaser 操作體驗 回答乘法題並立即查看提示。</p>
+                <p>每次選擇後立即看到乘法拆解，知道正確答案如何算出來。</p>
               </div>
-              <div class="frame-heading"><span>Phaser 可操作體驗</span><span>選擇一個答案</span></div>
-              <div class="demo-stage" data-demo="feedback" role="group" aria-label="回答乘法題並查看即時提示的 Phaser 遊戲"></div>
-              <p class="demo-status" aria-live="polite">遊戲載入中</p>
+              <div class="frame-heading"><span>即時回饋　作答後顯示乘法解說</span><button class="fullscreen-button" type="button" data-fullscreen-for="game-feedback">全螢幕</button></div>
+              <iframe class="game-embed" id="game-feedback" title="即時回饋機制的乘法星球遊戲" src="./index.html?embed=1&amp;mechanic=feedback" loading="lazy" allow="fullscreen" allowfullscreen></iframe>
             </article>
           </div>
 
@@ -489,11 +502,10 @@
                 <h3>記憶提取</h3>
                 <p>翻牌配對要求學生回想先前看過的資訊，適合練習詞語、概念、符號與解釋之間的連結。</p>
                 <p class="classroom-link"><strong>課堂連結</strong> 配對算式與答案，或配對單字與圖片。</p>
-                <p>Phaser 操作體驗 翻牌找出算式和答案配對。</p>
+                <p>每解開一題就要回想剛才的乘法事實，再繼續新的航段。</p>
               </div>
-              <div class="frame-heading"><span>Phaser 可操作體驗</span><span>翻開卡片找配對</span></div>
-              <div class="demo-stage" data-demo="memory" role="group" aria-label="翻牌配對乘法算式和答案的 Phaser 遊戲"></div>
-              <p class="demo-status" aria-live="polite">遊戲載入中</p>
+              <div class="frame-heading"><span>記憶提取　作答後回想上一題</span><button class="fullscreen-button" type="button" data-fullscreen-for="game-memory">全螢幕</button></div>
+              <iframe class="game-embed" id="game-memory" title="記憶提取機制的乘法星球遊戲" src="./index.html?embed=1&amp;mechanic=memory" loading="lazy" allow="fullscreen" allowfullscreen></iframe>
             </article>
           </div>
 
@@ -503,12 +515,11 @@
                 <span class="number-tag">05</span>
                 <h3>限時挑戰</h3>
                 <p>倒數計時帶來節奏感，適合熟練練習。若目標是理解新概念，可放寬時間或提供不計時模式。</p>
-                <p class="classroom-link"><strong>課堂連結</strong> 用自選時間完成配對，結束後比較解題策略。</p>
-                <p>Phaser 操作體驗 在倒數結束前點中移動星星。</p>
+                <p class="classroom-link"><strong>課堂連結</strong> 以短倒數練習熟練度，結束後比較解題策略。</p>
+                <p>每題限時二十秒，時間內移動太空人蒐集正確答案。</p>
               </div>
-              <div class="frame-heading"><span>Phaser 可操作體驗</span><span>開始後追蹤星星</span></div>
-              <div class="demo-stage" data-demo="timer" role="group" aria-label="限時點擊移動星星的 Phaser 遊戲"></div>
-              <p class="demo-status" aria-live="polite">遊戲載入中</p>
+              <div class="frame-heading"><span>限時挑戰　每題倒數二十秒</span><button class="fullscreen-button" type="button" data-fullscreen-for="game-timer">全螢幕</button></div>
+              <iframe class="game-embed" id="game-timer" title="限時挑戰機制的乘法星球遊戲" src="./index.html?embed=1&amp;mechanic=timer" loading="lazy" allow="fullscreen" allowfullscreen></iframe>
             </article>
           </div>
 
@@ -519,11 +530,10 @@
                 <h3>風險與選擇</h3>
                 <p>不同選擇帶來不同結果，學生要衡量線索與風險，再決定何時行動。</p>
                 <p class="classroom-link"><strong>課堂連結</strong> 從多個答案中選路，錯誤選項會增加挑戰但不阻斷學習。</p>
-                <p>Phaser 操作體驗 閱讀線索後選擇路線，衡量風險與報酬。</p>
+                <p>每題先選安全航線或冒險航線，分別承擔不同的加分與扣分。</p>
               </div>
-              <div class="frame-heading"><span>Phaser 可操作體驗</span><span>選擇一條路線</span></div>
-              <div class="demo-stage" data-demo="choice" role="group" aria-label="依線索衡量風險和獎勵的 Phaser 遊戲"></div>
-              <p class="demo-status" aria-live="polite">遊戲載入中</p>
+              <div class="frame-heading"><span>風險與選擇　安全航線或高報酬航線</span><button class="fullscreen-button" type="button" data-fullscreen-for="game-choice">全螢幕</button></div>
+              <iframe class="game-embed" id="game-choice" title="風險與選擇機制的乘法星球遊戲" src="./index.html?embed=1&amp;mechanic=choice" loading="lazy" allow="fullscreen" allowfullscreen></iframe>
             </article>
           </div>
 
@@ -534,11 +544,10 @@
                 <h3>生命與再次嘗試</h3>
                 <p>生命值呈現挑戰成本。提供重試機會或提示，讓學生能從失誤中修正，不因一次答錯就退出。</p>
                 <p class="classroom-link"><strong>課堂連結</strong> 答錯先失去一顆能量，完成補救練習即可回復。</p>
-                <p>Phaser 操作體驗 練習乘法並留意剩餘能量。</p>
+                <p>三格救援機會支撐再次嘗試，連續答對兩題可補回一格能量。</p>
               </div>
-              <div class="frame-heading"><span>Phaser 可操作體驗</span><span>答錯會消耗能量</span></div>
-              <div class="demo-stage" data-demo="lives" role="group" aria-label="答題消耗能量並可再次嘗試的 Phaser 遊戲"></div>
-              <p class="demo-status" aria-live="polite">遊戲載入中</p>
+              <div class="frame-heading"><span>生命與再次嘗試　答對連勝補回能量</span><button class="fullscreen-button" type="button" data-fullscreen-for="game-lives">全螢幕</button></div>
+              <iframe class="game-embed" id="game-lives" title="生命與再次嘗試機制的乘法星球遊戲" src="./index.html?embed=1&amp;mechanic=lives" loading="lazy" allow="fullscreen" allowfullscreen></iframe>
             </article>
           </div>
 
@@ -549,11 +558,10 @@
                 <h3>空間規劃</h3>
                 <p>學生預想移動順序與後續位置，練習空間推理、步驟規劃與策略修正。</p>
                 <p class="classroom-link"><strong>課堂連結</strong> 把概念卡片排成正確順序，移動前先預測結果。</p>
-                <p>Phaser 操作體驗 用方向鍵規劃移動路徑，走到出口。</p>
+                <p>太空人會留在上一題的抵達位置，學生要規劃下一條安全路徑。</p>
               </div>
-              <div class="frame-heading"><span>Phaser 可操作體驗</span><span>點擊方向規劃路徑</span></div>
-              <div class="demo-stage" data-demo="planning" role="group" aria-label="規劃格子路徑抵達出口的 Phaser 遊戲"></div>
-              <p class="demo-status" aria-live="polite">遊戲載入中</p>
+              <div class="frame-heading"><span>空間規劃　連續規劃太空人行進路徑</span><button class="fullscreen-button" type="button" data-fullscreen-for="game-planning">全螢幕</button></div>
+              <iframe class="game-embed" id="game-planning" title="空間規劃機制的乘法星球遊戲" src="./index.html?embed=1&amp;mechanic=planning" loading="lazy" allow="fullscreen" allowfullscreen></iframe>
             </article>
           </div>
 
@@ -564,11 +572,10 @@
                 <h3>線索推理</h3>
                 <p>學生從已知線索推導未知答案，練習解讀資訊、排除選項與說明理由。</p>
                 <p class="classroom-link"><strong>課堂連結</strong> 用數字線索推理地雷位置，並說明每一步判斷。</p>
-                <p>Phaser 操作體驗 根據文字線索找出正確的星球。</p>
+                <p>先用分解乘法的提示推理答案，再移動角色收集對應星球。</p>
               </div>
-              <div class="frame-heading"><span>Phaser 可操作體驗</span><span>閱讀條件再選答案</span></div>
-              <div class="demo-stage" data-demo="clue" role="group" aria-label="閱讀數學條件並推理答案的 Phaser 遊戲"></div>
-              <p class="demo-status" aria-live="polite">遊戲載入中</p>
+              <div class="frame-heading"><span>線索推理　根據乘法分解提示作答</span><button class="fullscreen-button" type="button" data-fullscreen-for="game-clue">全螢幕</button></div>
+              <iframe class="game-embed" id="game-clue" title="線索推理機制的乘法星球遊戲" src="./index.html?embed=1&amp;mechanic=clue" loading="lazy" allow="fullscreen" allowfullscreen></iframe>
             </article>
           </div>
 
@@ -579,12 +586,10 @@
                 <h3>漸進難度</h3>
                 <p>逐步提高速度或任務複雜度，讓學生先熟悉規則，再進入更高挑戰。</p>
                 <p class="classroom-link"><strong>課堂連結</strong> 先熟悉 2、5、10 倍，再逐關挑戰 3 到 12 倍，讓難度跟著乘法能力增加。</p>
-                <p>Phaser 操作體驗 抓準時機堆疊方塊，逐步提高挑戰。</p>
-                <p class="mb-0"><a class="btn btn-sm btn-teal" href="./index.html">試玩乘法教學版</a></p>
+                <p>五個關卡從熟悉的倍數開始，逐步挑戰更大的乘數與更複雜的航段。</p>
               </div>
-              <div class="frame-heading"><span>Phaser 可操作體驗</span><span>點擊畫面放下方塊</span></div>
-              <div class="demo-stage" data-demo="progression" role="group" aria-label="抓準時機堆疊並逐步提高難度的 Phaser 遊戲"></div>
-              <p class="demo-status" aria-live="polite">遊戲載入中</p>
+              <div class="frame-heading"><span>漸進難度　由基礎倍數逐關返家</span><button class="fullscreen-button" type="button" data-fullscreen-for="game-progression">全螢幕</button></div>
+              <iframe class="game-embed" id="game-progression" title="漸進難度機制的乘法星球遊戲" src="./index.html?embed=1&amp;mechanic=progression" loading="lazy" allow="fullscreen" allowfullscreen></iframe>
             </article>
           </div>
         </div>
@@ -599,7 +604,7 @@
           <p class="mb-2">本頁對遊戲式學習的說明參考教育研究中對學習目標、遊戲內容、問題解決與挑戰的整理。</p>
           <p class="mb-2"><a href="https://www.sciencedirect.com/science/article/pii/S0747563216303491" target="_blank" rel="noreferrer">Game Based Learning and 21st Century Skills 研究回顧</a></p>
           <p class="mb-2"><a href="https://github.com/phaserjs/examples/tree/master/public/src/games" target="_blank" rel="noreferrer">Phaser 官方遊戲範例目錄</a> · <a href="https://labs.phaser.io/phaser4-index.html?path=games" target="_blank" rel="noreferrer">Phaser Labs 線上範例</a></p>
-          <p class="mb-0">十個可操作範例以 Phaser 製作，載入 Phaser 與 Bootstrap 需要網路連線。</p>
+          <p class="mb-0">十款乘法返家遊戲以 Phaser 製作，各自實作不同遊戲機制。載入 Phaser 與 Bootstrap 需要網路連線。</p>
         </div>
       </div>
     </section>
@@ -613,732 +618,29 @@
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/phaser@4.2.1/dist/phaser.min.js" crossorigin="anonymous"></script>
   <script>
-    const demoWidth = 560
-    const demoHeight = 315
-    const demoBg = 0xe7f3ed
-    const demoInk = '#20333f'
-    const demoTeal = 0x176d68
-    const demoGold = 0xe9b64c
-    const demoCoral = 0xd95f47
+    document.querySelectorAll('[data-fullscreen-for]').forEach(button => {
+      const frame = document.getElementById(button.dataset.fullscreenFor)
+      if (!frame) return
 
-    function demoText(scene, x, y, text, size = 18, color = demoInk, originX = 0.5, originY = 0.5) {
-      return scene.add.text(x, y, text, {
-        fontFamily: 'system-ui, Microsoft JhengHei, sans-serif',
-        fontSize: size,
-        color,
-        fontStyle: 'bold',
-        align: 'center'
-      }).setOrigin(originX, originY)
-    }
-
-    function demoButton(scene, x, y, width, height, label, action, options = {}) {
-      const fill = options.fill ?? 0xffffff
-      const stroke = options.stroke ?? 0xc8d8cf
-      const color = options.color ?? demoInk
-      const bg = scene.add.rectangle(x, y, width, height, fill, 1).setStrokeStyle(2, stroke)
-      const text = demoText(scene, x, y, label, options.size ?? 16, color)
-      bg.setInteractive({ useHandCursor: true }).on('pointerdown', action)
-      text.setInteractive({ useHandCursor: true }).on('pointerdown', action)
-      return { bg, text }
-    }
-
-    function hideDemoButton(button) {
-      button.bg.setVisible(false).disableInteractive()
-      button.text.setVisible(false).disableInteractive()
-    }
-
-    function showDemoButton(button) {
-      button.bg.setVisible(true).setInteractive({ useHandCursor: true })
-      button.text.setVisible(true).setInteractive({ useHandCursor: true })
-    }
-
-    function setDemoStatus(scene, message) {
-      if (scene.statusNode) scene.statusNode.textContent = message
-    }
-
-    function makeDemoScene(id, statusNode) {
-      return class extends Phaser.Scene {
-        constructor() {
-          super({ key: `mechanic-${id}-${Math.random().toString(36).slice(2)}` })
+      button.addEventListener('click', async () => {
+        try {
+          if (document.fullscreenElement === frame) {
+            await document.exitFullscreen()
+          } else if (frame.requestFullscreen) {
+            await frame.requestFullscreen()
+          } else {
+            window.open(frame.src, '_blank', 'noopener,noreferrer')
+          }
+        } catch {
+          window.open(frame.src, '_blank', 'noopener,noreferrer')
         }
-
-        create() {
-          this.statusNode = statusNode
-          this.add.rectangle(demoWidth / 2, demoHeight / 2, demoWidth, demoHeight, demoBg)
-          demoText(this, 18, 15, '遊戲式學習操作區', 13, '#658078', 0, 0)
-          if (id === 'mission') this.createMission()
-          if (id === 'reward') this.createReward()
-          if (id === 'feedback') this.createFeedback()
-          if (id === 'memory') this.createMemory()
-          if (id === 'timer') this.createTimer()
-          if (id === 'choice') this.createChoice()
-          if (id === 'lives') this.createLives()
-          if (id === 'planning') this.createPlanning()
-          if (id === 'clue') this.createClue()
-          if (id === 'progression') this.createProgression()
-          setDemoStatus(this, '請直接操作遊戲畫面')
-        }
-
-        createMission() {
-          demoText(this, 280, 54, '任務：收集三顆星星', 21)
-          let count = 0
-          const progress = demoText(this, 280, 88, '已收集 0 / 3', 15, '#176d68')
-          const gate = demoButton(this, 445, 235, 112, 54, '終點', () => {
-            if (count < 3) {
-              setDemoStatus(this, '還差幾顆星星，繼續探索吧')
-              return
-            }
-            gate.text.setText('抵達！')
-            gate.bg.setFillStyle(0xcce8d9)
-            setDemoStatus(this, '任務完成，你找到通往終點的路了')
-          }, { fill: 0xdce6e1, stroke: 0x9ab1a7 })
-          const positions = [[130, 165], [280, 165], [430, 165]]
-          positions.forEach(([x, y], index) => {
-            const star = demoButton(this, x, y, 66, 66, '★', () => {
-              star.bg.disableInteractive()
-              star.text.disableInteractive()
-              star.bg.setVisible(false)
-              star.text.setVisible(false)
-              count += 1
-              progress.setText(`已收集 ${count} / 3`)
-              setDemoStatus(this, count === 3 ? '星星收齊了，點擊終點完成任務' : `找到第 ${count} 顆星星`)
-              if (count === 3) gate.bg.setFillStyle(0xbfe7d5)
-            }, { fill: 0xfff2c8, stroke: demoGold, color: '#b87918', size: 30 })
-            star.text.setText('★')
-          })
-          gate.text.setText('終點')
-        }
-
-        createReward() {
-          demoText(this, 280, 50, '點擊金幣，收集獎勵', 20)
-          let score = 0
-          let seconds = 20
-          const scoreText = demoText(this, 118, 91, '分數 0', 16, '#176d68')
-          const timeText = demoText(this, 442, 91, '時間 20', 16, '#a34c32')
-          let active = false
-          let timerEvent = null
-          const finish = () => {
-            if (!active) return
-            active = false
-            if (timerEvent) timerEvent.remove(false)
-            setDemoStatus(this, `時間到，總共得到 ${score} 分`)
-            start.text.setText('再玩一次')
-            showDemoButton(start)
-          }
-          const coins = []
-          const positions = [[145, 150], [280, 150], [415, 150], [210, 230], [350, 230]]
-          positions.forEach(([x, y]) => {
-            const coin = demoButton(this, x, y, 56, 56, '✦', () => {
-              if (!active) return
-              coin.bg.disableInteractive()
-              coin.text.disableInteractive()
-              coin.bg.setVisible(false)
-              coin.text.setVisible(false)
-              score += 10
-              scoreText.setText(`分數 ${score}`)
-              setDemoStatus(this, '收集成功，獲得十分')
-              if (coins.every(item => !item.bg.visible)) finish()
-            }, { fill: 0xfff1c2, stroke: demoGold, color: '#b87918', size: 25 })
-            coins.push(coin)
-          })
-          const start = demoButton(this, 280, 114, 120, 36, '開始收集', () => {
-            if (active) return
-            score = 0
-            seconds = 20
-            scoreText.setText('分數 0')
-            timeText.setText('時間 20')
-            coins.forEach(coin => {
-              showDemoButton(coin)
-              coin.bg.setFillStyle(0xfff1c2)
-            })
-            active = true
-            hideDemoButton(start)
-            timerEvent = this.time.addEvent({
-              delay: 1000,
-              repeat: 19,
-              callback: () => {
-                seconds -= 1
-                timeText.setText(`時間 ${seconds}`)
-                if (seconds <= 0) finish()
-              }
-            })
-            setDemoStatus(this, '倒數開始，點擊所有金幣')
-          }, { fill: demoTeal, stroke: demoTeal, color: '#ffffff', size: 14 })
-          this.events.once('shutdown', () => this.time.removeAllEvents())
-        }
-
-        createFeedback() {
-          const scene = this
-          const questions = [
-            { question: '3 × 4 = ?', answer: 12, choices: [10, 12, 14], hint: '3 組 4 個合起來是 12' },
-            { question: '5 × 2 = ?', answer: 10, choices: [8, 10, 12], hint: '5 組 2 個合起來是 10' },
-            { question: '4 × 4 = ?', answer: 16, choices: [12, 14, 16], hint: '4 組 4 個合起來是 16' }
-          ]
-          let round = 0
-          let score = 0
-          let locked = false
-          const question = demoText(this, 280, 68, '', 27)
-          const feedback = demoText(this, 280, 115, '選一個答案，看看回饋', 15, '#658078')
-          const buttons = [
-            demoButton(this, 110, 190, 118, 64, '', value => answer(value), { fill: 0xffffff, stroke: 0xc8d8cf, size: 21 }),
-            demoButton(this, 280, 190, 118, 64, '', value => answer(value), { fill: 0xffffff, stroke: 0xc8d8cf, size: 21 }),
-            demoButton(this, 450, 190, 118, 64, '', value => answer(value), { fill: 0xffffff, stroke: 0xc8d8cf, size: 21 })
-          ]
-          const continueButton = demoButton(this, 280, 270, 138, 38, '下一題', next, { fill: demoTeal, stroke: demoTeal, color: '#ffffff', size: 14 })
-          hideDemoButton(continueButton)
-          function draw() {
-            const item = questions[round]
-            question.setText(item.question)
-            feedback.setText('選一個答案，看看回饋').setColor('#658078')
-            hideDemoButton(continueButton)
-            buttons.forEach((button, index) => {
-              button.bg.setVisible(true).setInteractive({ useHandCursor: true }).setFillStyle(0xffffff)
-              button.text.setVisible(true).setInteractive({ useHandCursor: true })
-              button.text.setText(String(item.choices[index]))
-              button.bg.removeAllListeners('pointerdown')
-              button.text.removeAllListeners('pointerdown')
-              const chosen = item.choices[index]
-              button.bg.on('pointerdown', () => answer(chosen))
-              button.text.on('pointerdown', () => answer(chosen))
-            })
-            locked = false
-          }
-          function answer(value) {
-            if (locked) return
-            locked = true
-            const item = questions[round]
-            const correct = value === item.answer
-            if (correct) score += 1
-            feedback.setText(correct ? `答對了！${item.hint}` : `再想想：${item.hint}`)
-            feedback.setColor(correct ? '#176d68' : '#b14a35')
-            buttons.forEach(button => {
-              button.bg.disableInteractive()
-              button.text.disableInteractive()
-            })
-            setDemoStatus(scene, correct ? '正確答案，獲得即時回饋' : '回饋提示指出了思考方向')
-            showDemoButton(continueButton)
-          }
-          function next() {
-            round += 1
-            if (round >= questions.length) {
-              question.setText('練習完成')
-              feedback.setText(`答對 ${score} 題，回饋幫助你修正想法`)
-              buttons.forEach(button => {
-                hideDemoButton(button)
-              })
-              continueButton.text.setText('再玩一次')
-              round = -1
-              continueButton.bg.removeAllListeners('pointerdown')
-              continueButton.text.removeAllListeners('pointerdown')
-              continueButton.bg.on('pointerdown', reset)
-              continueButton.text.on('pointerdown', reset)
-              showDemoButton(continueButton)
-              setDemoStatus(scene, '完成三題，可以重新開始')
-              return
-            }
-            draw()
-          }
-          function reset() {
-            round = 0
-            score = 0
-            continueButton.bg.removeAllListeners('pointerdown')
-            continueButton.text.removeAllListeners('pointerdown')
-            continueButton.bg.on('pointerdown', next)
-            continueButton.text.on('pointerdown', next)
-            draw()
-          }
-          continueButton.bg.removeAllListeners('pointerdown')
-          continueButton.text.removeAllListeners('pointerdown')
-          continueButton.bg.on('pointerdown', next)
-          continueButton.text.on('pointerdown', next)
-          buttons.forEach(button => {
-            button.bg.on('pointerdown', () => answer(Number(button.text.text)))
-            button.text.on('pointerdown', () => answer(Number(button.text.text)))
-          })
-          draw()
-        }
-
-        createMemory() {
-          demoText(this, 280, 48, '翻開卡片，配對算式和答案', 18)
-          const cards = [
-            { pair: 1, label: '2 × 3' }, { pair: 1, label: '6' },
-            { pair: 2, label: '3 × 4' }, { pair: 2, label: '12' },
-            { pair: 3, label: '4 × 2' }, { pair: 3, label: '8' }
-          ].sort(() => Math.random() - 0.5)
-          const positions = [[115, 125], [280, 125], [445, 125], [115, 220], [280, 220], [445, 220]]
-          let first = null
-          let locked = false
-          let matched = 0
-          const items = cards.map((card, index) => {
-            const [x, y] = positions[index]
-            const item = demoButton(this, x, y, 112, 68, '?', () => {
-              if (locked || item.matched || item.revealed) return
-              item.revealed = true
-              item.text.setText(card.label)
-              item.bg.setFillStyle(0xfff1c2)
-              if (!first) {
-                first = item
-                return
-              }
-              locked = true
-              if (first.pair === item.pair) {
-                first.matched = true
-                item.matched = true
-                matched += 1
-                first.bg.setFillStyle(0xcce8d9)
-                item.bg.setFillStyle(0xcce8d9)
-                first = null
-                locked = false
-                setDemoStatus(this, matched === 3 ? '全部配對成功，記憶任務完成' : `配對成功，已找到 ${matched} 組`)
-              } else {
-                const previous = first
-                first = null
-                setDemoStatus(this, '不相符，記住卡片位置再試一次')
-                this.time.delayedCall(700, () => {
-                  previous.revealed = false
-                  item.revealed = false
-                  previous.text.setText('?')
-                  item.text.setText('?')
-                  previous.bg.setFillStyle(0xffffff)
-                  item.bg.setFillStyle(0xffffff)
-                  locked = false
-                })
-              }
-            }, { fill: 0xffffff, stroke: 0x9ab1a7, size: 18 })
-            item.pair = card.pair
-            item.revealed = false
-            item.matched = false
-            return item
-          })
-        }
-
-        createTimer() {
-          demoText(this, 280, 48, '追上移動的星星', 21)
-          let score = 0
-          let seconds = 15
-          let active = false
-          let moveEvent = null
-          const scoreText = demoText(this, 120, 88, '命中 0 次', 15, '#176d68')
-          const clock = demoText(this, 440, 88, '時間 15', 15, '#a34c32')
-          const target = demoButton(this, 280, 190, 72, 72, '★', () => {
-            if (!active) return
-            score += 1
-            scoreText.setText(`命中 ${score} 次`)
-            target.bg.x = Phaser.Math.Between(72, 488)
-            target.bg.y = Phaser.Math.Between(130, 255)
-            target.text.setPosition(target.bg.x, target.bg.y)
-            setDemoStatus(this, '命中星星，繼續追蹤')
-          }, { fill: 0xfff1c2, stroke: demoGold, color: '#b87918', size: 27 })
-          const start = demoButton(this, 280, 282, 136, 38, '開始挑戰', () => {
-            if (active) return
-            active = true
-            seconds = 15
-            score = 0
-            scoreText.setText('命中 0 次')
-            start.text.setText('挑戰進行中')
-            start.bg.setFillStyle(0xcce8d9)
-            if (moveEvent) moveEvent.remove(false)
-            moveEvent = this.time.addEvent({
-              delay: 850,
-              loop: true,
-              callback: () => {
-                if (!active) return
-                target.bg.setPosition(Phaser.Math.Between(72, 488), Phaser.Math.Between(130, 255))
-                target.text.setPosition(target.bg.x, target.bg.y)
-              }
-            })
-            this.time.addEvent({ delay: 1000, repeat: 14, callback: () => {
-              seconds -= 1
-              clock.setText(`時間 ${seconds}`)
-              if (seconds <= 0) {
-                active = false
-                if (moveEvent) moveEvent.remove(false)
-                start.text.setText('再挑戰一次')
-                start.bg.setFillStyle(demoTeal)
-                start.text.setColor('#ffffff')
-                setDemoStatus(this, `時間到，你命中 ${score} 次`)
-              }
-            } })
-            setDemoStatus(this, '倒數開始，點擊移動中的星星')
-          }, { fill: demoTeal, stroke: demoTeal, color: '#ffffff', size: 14 })
-        }
-
-        createChoice() {
-          demoText(this, 280, 48, '選路前先讀線索', 21)
-          demoText(this, 280, 91, '藍色路線安全穩定，紅色路線獎勵高但可能失分', 14, '#52636b')
-          let score = 0
-          const scoreText = demoText(this, 280, 126, '星塵 0', 15, '#176d68')
-          const result = demoText(this, 280, 166, '你會選哪條路？', 15, '#658078')
-          const options = [
-            { x: 105, label: '藍色安全路', type: 'safe', fill: 0xd8eee5 },
-            { x: 280, label: '金色未知路', type: 'unknown', fill: 0xfff1c2 },
-            { x: 455, label: '紅色高風險', type: 'risk', fill: 0xf8ddd4 }
-          ]
-          const buttons = []
-          function build() {
-            buttons.forEach(button => {
-              showDemoButton(button)
-            })
-            hideDemoButton(again)
-            result.setText('你會選哪條路？').setColor('#658078')
-          }
-          options.forEach(option => {
-            const button = demoButton(this, option.x, 225, 140, 62, option.label, () => {
-              let change = 0
-              let message = ''
-              if (option.type === 'safe') {
-                change = 5
-                message = '安全路線讓你穩定得到五顆星塵'
-              } else if (option.type === 'risk' && Math.random() < 0.5) {
-                change = 15
-                message = '冒險成功，得到十五顆星塵'
-              } else if (option.type === 'risk') {
-                change = -5
-                message = '遇到陷阱，失去五顆星塵'
-              } else if (Math.random() < 0.5) {
-                change = 10
-                message = '未知路線藏著驚喜，得到十顆星塵'
-              } else {
-                message = '未知路線沒有收穫，但也沒有損失'
-              }
-              score = Math.max(0, score + change)
-              scoreText.setText(`星塵 ${score}`)
-              result.setText(message).setColor(change < 0 ? '#b14a35' : '#176d68')
-              buttons.forEach(item => {
-                hideDemoButton(item)
-              })
-              setDemoStatus(this, '選擇會改變獎勵，想好策略再走下一條路')
-              showDemoButton(again)
-            }, { fill: option.fill, stroke: 0xc8d8cf, size: 14 })
-            buttons.push(button)
-          })
-          const again = demoButton(this, 280, 235, 138, 44, '再選一條路', build, { fill: demoTeal, stroke: demoTeal, color: '#ffffff', size: 14 })
-          hideDemoButton(again)
-        }
-
-        createLives() {
-          const scene = this
-          const questions = [
-            { prompt: '2 × 4 = ?', answer: 8, choices: [6, 8, 10] },
-            { prompt: '3 × 5 = ?', answer: 15, choices: [12, 15, 18] },
-            { prompt: '6 × 2 = ?', answer: 12, choices: [10, 12, 14] }
-          ]
-          let lives = 3
-          let round = 0
-          let locked = false
-          const heart = demoText(this, 280, 48, '能量 ♥ ♥ ♥', 16, '#b14a35')
-          const prompt = demoText(this, 280, 100, '', 27)
-          const feedback = demoText(this, 280, 143, '答錯可以再試一次', 14, '#658078')
-          const buttons = [
-            demoButton(this, 110, 218, 118, 58, '', value => choose(value), { fill: 0xffffff, size: 20 }),
-            demoButton(this, 280, 218, 118, 58, '', value => choose(value), { fill: 0xffffff, size: 20 }),
-            demoButton(this, 450, 218, 118, 58, '', value => choose(value), { fill: 0xffffff, size: 20 })
-          ]
-          const restart = demoButton(this, 280, 278, 140, 40, '再次挑戰', reset, { fill: demoTeal, stroke: demoTeal, color: '#ffffff', size: 14 })
-          hideDemoButton(restart)
-          function draw() {
-            const item = questions[round % questions.length]
-            prompt.setText(item.prompt)
-            buttons.forEach((button, index) => {
-              button.bg.setVisible(true).setFillStyle(0xffffff).setInteractive({ useHandCursor: true })
-              button.text.setVisible(true).setInteractive({ useHandCursor: true }).setText(String(item.choices[index]))
-              button.bg.removeAllListeners('pointerdown')
-              button.text.removeAllListeners('pointerdown')
-              const value = item.choices[index]
-              button.bg.on('pointerdown', () => choose(value))
-              button.text.on('pointerdown', () => choose(value))
-            })
-            locked = false
-          }
-          function choose(value) {
-            if (locked) return
-            const item = questions[round % questions.length]
-            if (value === item.answer) {
-              locked = true
-              feedback.setText('答對了，能量保留下來').setColor('#176d68')
-              round += 1
-              setDemoStatus(scene, '答對並保留能量，下一題即將出現')
-              buttons.forEach(button => {
-                button.bg.disableInteractive()
-                button.text.disableInteractive()
-              })
-              scene.time.delayedCall(750, () => {
-                draw()
-                feedback.setText('繼續練習，留意剩餘能量').setColor('#658078')
-              })
-              return
-            }
-            lives -= 1
-            heart.setText(`能量 ${'♥ '.repeat(lives)}${'♡ '.repeat(3 - lives)}`)
-            feedback.setText(lives > 0 ? '再想一想，這題可以重試' : '能量用完了，休息後再挑戰').setColor('#b14a35')
-            setDemoStatus(scene, lives > 0 ? '答錯消耗一格能量，仍可再次嘗試' : '能量用完，點擊再次挑戰')
-            if (lives <= 0) {
-              locked = true
-              buttons.forEach(button => {
-              hideDemoButton(button)
-              })
-            showDemoButton(restart)
-            }
-          }
-          function reset() {
-            lives = 3
-            round = 0
-            heart.setText('能量 ♥ ♥ ♥')
-            feedback.setText('答錯可以再試一次').setColor('#658078')
-            hideDemoButton(restart)
-            draw()
-          }
-          draw()
-        }
-
-        createPlanning() {
-          demoText(this, 280, 38, '安排步驟，走到出口', 18)
-          const cellSize = 56
-          const startX = 58
-          const startY = 74
-          const blocks = new Set(['1,2', '2,2', '2,1'])
-          const cells = []
-          let player = { x: 0, y: 3 }
-          let moves = 0
-          const moveText = demoText(this, 180, 293, '步數 0', 13, '#658078')
-          for (let row = 0; row < 4; row += 1) {
-            for (let col = 0; col < 4; col += 1) {
-              const x = startX + col * cellSize
-              const y = startY + row * cellSize
-              const rect = this.add.rectangle(x, y, 48, 48, blocks.has(`${col},${row}`) ? 0x8b9892 : 0xffffff).setStrokeStyle(2, 0xc8d8cf)
-              if (col === 3 && row === 0) demoText(this, x, y, '出口', 13, '#176d68')
-              if (blocks.has(`${col},${row}`)) demoText(this, x, y, '岩石', 12, '#ffffff')
-              cells.push({ col, row, rect })
-            }
-          }
-          this.playerIcon = demoText(this, startX, startY + 3 * cellSize, '🚀', 23)
-          const move = (dx, dy) => {
-            const nextX = player.x + dx
-            const nextY = player.y + dy
-            if (nextX < 0 || nextX > 3 || nextY < 0 || nextY > 3 || blocks.has(`${nextX},${nextY}`)) {
-              setDemoStatus(this, '前方有障礙，換一條路試試')
-              return
-            }
-            player = { x: nextX, y: nextY }
-            moves += 1
-            moveText.setText(`步數 ${moves}`)
-            cells.forEach(cell => {
-              if (cell.col === player.x && cell.row === player.y) cell.rect.setFillStyle(0xcce8d9)
-              else if (!blocks.has(`${cell.col},${cell.row}`)) cell.rect.setFillStyle(0xffffff)
-            })
-            const px = startX + player.x * cellSize
-            const py = startY + player.y * cellSize
-            this.playerIcon.setPosition(px, py)
-            if (player.x === 3 && player.y === 0) setDemoStatus(this, `成功抵達出口，共走 ${moves} 步`)
-          }
-          const directions = [
-            { x: 438, y: 136, label: '↑', dx: 0, dy: -1 },
-            { x: 398, y: 177, label: '←', dx: -1, dy: 0 },
-            { x: 478, y: 177, label: '→', dx: 1, dy: 0 },
-            { x: 438, y: 218, label: '↓', dx: 0, dy: 1 }
-          ]
-          directions.forEach(direction => demoButton(this, direction.x, direction.y, 42, 34, direction.label, () => move(direction.dx, direction.dy), { fill: 0xffffff, stroke: 0x9ab1a7, size: 18 }))
-          demoText(this, 438, 268, '點方向移動', 13, '#658078')
-        }
-
-        createClue() {
-          const scene = this
-          const puzzles = [
-            { product: 12, factor: 3, choices: ['3 × 4', '2 × 5', '4 × 4'], answer: '3 × 4' },
-            { product: 18, factor: 6, choices: ['6 × 3', '5 × 3', '4 × 4'], answer: '6 × 3' },
-            { product: 20, factor: 4, choices: ['4 × 5', '3 × 6', '4 × 4'], answer: '4 × 5' }
-          ]
-          let round = 0
-          let locked = false
-          const clue = demoText(this, 280, 69, '', 18)
-          const hint = demoText(this, 280, 111, '', 14, '#658078')
-          const answerText = demoText(this, 280, 150, '找出符合兩條線索的答案', 14, '#176d68')
-          const buttons = [
-            demoButton(this, 110, 222, 130, 62, '', value => choose(value), { fill: 0xffffff, size: 17 }),
-            demoButton(this, 280, 222, 130, 62, '', value => choose(value), { fill: 0xffffff, size: 17 }),
-            demoButton(this, 450, 222, 130, 62, '', value => choose(value), { fill: 0xffffff, size: 17 })
-          ]
-          const next = demoButton(this, 280, 282, 132, 38, '下一個謎題', advance, { fill: demoTeal, stroke: demoTeal, color: '#ffffff', size: 14 })
-          hideDemoButton(next)
-          function draw() {
-            const item = puzzles[round]
-            clue.setText(`線索一：乘積是 ${item.product}`)
-            hint.setText(`線索二：其中一個因數是 ${item.factor}`)
-            answerText.setText('找出符合兩條線索的答案').setColor('#176d68')
-            buttons.forEach((button, index) => {
-              button.bg.setVisible(true).setFillStyle(0xffffff).setInteractive({ useHandCursor: true })
-              button.text.setVisible(true).setText(item.choices[index]).setInteractive({ useHandCursor: true })
-              button.bg.removeAllListeners('pointerdown')
-              button.text.removeAllListeners('pointerdown')
-              const value = item.choices[index]
-              button.bg.on('pointerdown', () => choose(value))
-              button.text.on('pointerdown', () => choose(value))
-            })
-            hideDemoButton(next)
-            locked = false
-          }
-          function choose(value) {
-            if (locked) return
-            locked = true
-            const item = puzzles[round]
-            const correct = value === item.answer
-            answerText.setText(correct ? '推理正確，兩條線索都符合' : '再核對一次乘積與因數').setColor(correct ? '#176d68' : '#b14a35')
-            buttons.forEach(button => {
-              button.bg.disableInteractive()
-              button.text.disableInteractive()
-            })
-            setDemoStatus(scene, correct ? '根據線索排除其他選項，推理成功' : '回看線索再試一次')
-            if (correct) {
-              showDemoButton(next)
-            } else {
-              locked = false
-              buttons.forEach(button => {
-                button.bg.setInteractive({ useHandCursor: true })
-                button.text.setInteractive({ useHandCursor: true })
-              })
-            }
-          }
-          function advance() {
-            round += 1
-            if (round >= puzzles.length) {
-              round = 0
-              setDemoStatus(scene, '推理關卡完成，可以再玩一次')
-            }
-            draw()
-          }
-          buttons.forEach(button => {
-            button.bg.on('pointerdown', () => choose(button.text.text))
-            button.text.on('pointerdown', () => choose(button.text.text))
-          })
-          next.bg.removeAllListeners('pointerdown')
-          next.text.removeAllListeners('pointerdown')
-          next.bg.on('pointerdown', advance)
-          next.text.on('pointerdown', advance)
-          draw()
-        }
-
-        createProgression() {
-          demoText(this, 280, 32, '堆疊方塊，挑戰逐步升高', 18)
-          let level = 0
-          let speed = 115
-          let direction = 1
-          let movingX = 110
-          let baseX = 280
-          let baseWidth = 220
-          let active = true
-          const base = this.add.rectangle(baseX, 273, baseWidth, 28, demoTeal)
-          const stack = []
-          const moving = this.add.rectangle(movingX, 238, baseWidth, 25, demoGold).setStrokeStyle(2, 0xc58d22)
-          const info = demoText(this, 280, 68, '第 1 層，點擊畫面放下方塊', 14, '#52636b')
-          const reset = () => {
-            level = 0
-            speed = 115
-            direction = 1
-            baseX = 280
-            baseWidth = 220
-            movingX = baseWidth / 2
-            active = true
-            base.setPosition(baseX, 273).setSize(baseWidth, 28).setVisible(true)
-            stack.forEach(piece => piece.destroy())
-            stack.length = 0
-            moving.setVisible(true).setPosition(movingX, 238).setSize(baseWidth, 25)
-            info.setText('第 1 層，點擊畫面放下方塊')
-            setDemoStatus(this, '點擊遊戲畫面放下方塊')
-          }
-          const drop = () => {
-            if (!active) {
-              reset()
-              return
-            }
-            const overlap = baseWidth - Math.abs(movingX - baseX)
-            if (overlap < 22) {
-              active = false
-              moving.setVisible(false)
-              info.setText(`挑戰停在第 ${level} 層`)
-              setDemoStatus(this, '方塊沒有對齊，點擊畫面重新挑戰')
-              return
-            }
-            const nextWidth = overlap
-            const nextX = (baseX + movingX) / 2
-            level += 1
-            const placed = this.add.rectangle(nextX, 273 - level * 28, nextWidth, 25, level % 2 ? 0x48a699 : 0x2d8f86)
-            stack.push(placed)
-            baseX = nextX
-            baseWidth = nextWidth
-            speed = Math.min(245, speed + 18)
-            if (level >= 6) {
-              active = false
-              moving.setVisible(false)
-              info.setText('六層完成，高手挑戰成功！')
-              setDemoStatus(this, '逐步提升難度並完成六層方塊')
-              return
-            }
-            direction *= -1
-            movingX = direction > 0 ? baseWidth / 2 : 560 - baseWidth / 2
-            moving.setVisible(true).setPosition(movingX, 238 - level * 28).setSize(baseWidth, 25)
-            info.setText(`第 ${level + 1} 層，速度增加中`)
-            setDemoStatus(this, `完成第 ${level} 層，下一層速度更快`)
-          }
-          this.input.on('pointerdown', drop)
-          this.events.on('update', (time, delta) => {
-            if (!active) return
-            movingX += direction * speed * delta / 1000
-            const edge = baseWidth / 2
-            const minX = edge
-            const maxX = 560 - edge
-            if (movingX >= maxX) {
-              movingX = maxX
-              direction = -1
-            } else if (movingX <= minX) {
-              movingX = minX
-              direction = 1
-            }
-            moving.setPosition(movingX, 238 - level * 28)
-          })
-          setDemoStatus(this, '點擊遊戲畫面放下方塊')
-        }
-      }
-    }
-
-    function launchMechanicDemo(stage) {
-      if (stage.dataset.ready === 'true') return
-      stage.dataset.ready = 'true'
-      const statusNode = stage.nextElementSibling
-      if (!window.Phaser) {
-        statusNode.textContent = '遊戲引擎載入失敗，請重新整理頁面'
-        return
-      }
-      const id = stage.dataset.demo
-      try {
-        new Phaser.Game({
-          type: Phaser.AUTO,
-          parent: stage,
-          width: demoWidth,
-          height: demoHeight,
-          backgroundColor: demoBg,
-          antialias: true,
-          scale: {
-            mode: Phaser.Scale.FIT,
-            autoCenter: Phaser.Scale.CENTER_BOTH
-          },
-          scene: makeDemoScene(id, statusNode)
-        })
-      } catch (error) {
-        statusNode.textContent = '遊戲載入失敗，請稍後再試'
-      }
-    }
-
-    const demoObserver = new IntersectionObserver(entries => {
-      entries.forEach(entry => {
-        if (!entry.isIntersecting) return
-        launchMechanicDemo(entry.target)
-        demoObserver.unobserve(entry.target)
       })
-    }, { rootMargin: '320px 0px' })
 
-    document.querySelectorAll('.demo-stage').forEach(stage => demoObserver.observe(stage))
+      document.addEventListener('fullscreenchange', () => {
+        button.textContent = document.fullscreenElement === frame ? '已全螢幕' : '全螢幕'
+      })
+    })
   </script>
 </body>
 </html>
