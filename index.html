@@ -59,7 +59,7 @@
     .progress-fill { width: 0; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #4bb899, #f1bd54); transition: width .35s ease; }
     .board-wrap { position: relative; padding: 0 18px; background: var(--paper); }
     #game { width: 100%; overflow: hidden; border: 1px solid #cfe3dc; border-radius: 19px; background: #dff5ec; }
-    #game canvas { display: block; width: 100% !important; height: auto !important; border-radius: 18px; touch-action: none; }
+    #game canvas { display: block; width: 100% !important; height: auto !important; border-radius: 18px; touch-action: none; cursor: crosshair; }
     .feedback {
       position: absolute; z-index: 2; top: 8px; left: 50%; max-width: calc(100% - 38px);
       padding: 7px 14px; transform: translate(-50%, -5px); border: 1px solid #ffffff;
@@ -76,20 +76,12 @@
     .result-box p { margin: 0 0 18px; color: var(--muted); }
     .restart { border: 0; border-radius: 13px; padding: 12px 21px; color: white; background: var(--teal); font-weight: 800; cursor: pointer; box-shadow: 0 4px 0 #0e5d59; }
     .restart:hover { background: #116e69; }
-    .restart:focus-visible, .pad button:focus-visible { outline: 3px solid #ffbd4a; outline-offset: 3px; }
+    .restart:focus-visible { outline: 3px solid #ffbd4a; outline-offset: 3px; }
     .below { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 16px 24px 20px; }
     .hint { display: flex; align-items: flex-start; gap: 11px; color: var(--muted); font-size: 13px; line-height: 1.65; }
     .hint-icon { display: grid; width: 31px; height: 31px; flex: 0 0 auto; place-items: center; border-radius: 10px; color: var(--teal); background: #e4f3ee; font-size: 15px; }
     .hint strong { color: var(--ink); }
-    .pad { display: none; grid-template-columns: repeat(3, 42px); grid-template-rows: repeat(2, 38px); gap: 4px; flex: 0 0 auto; }
-    .pad button { border: 1px solid #cbded7; border-radius: 10px; color: var(--ink); background: #f3f8f5; font-size: 15px; font-weight: 800; touch-action: none; user-select: none; }
-    .pad button:active, .pad button[aria-pressed="true"] { color: white; background: var(--teal); }
-    .pad .up { grid-column: 2; }
-    .pad .left { grid-column: 1; grid-row: 2; }
-    .pad .down { grid-column: 2; grid-row: 2; }
-    .pad .right { grid-column: 3; grid-row: 2; }
     .fallback { padding: 25px; color: #883c20; text-align: center; }
-    @media (pointer: coarse), (max-width: 700px) { .pad { display: grid; } }
     @media (max-width: 620px) {
       body { padding: 18px 10px 25px; }
       .masthead { gap: 10px; margin-left: 2px; }
@@ -113,7 +105,6 @@
       .below { align-items: center; gap: 8px; padding: 12px 14px 15px; }
       .hint { gap: 8px; font-size: 11px; }
       .hint-icon { width: 27px; height: 27px; }
-      .pad { grid-template-columns: repeat(3, 36px); grid-template-rows: repeat(2, 34px); }
     }
     @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; } }
   </style>
@@ -149,7 +140,7 @@
 
       <div class="board-wrap">
         <div class="feedback" id="feedback" role="status" aria-live="polite"></div>
-        <div id="game" aria-label="使用方向鍵或 WASD 移動太空探險員，碰觸答案星星作答"></div>
+        <div id="game" aria-label="使用滑鼠點選答案星球，太空探險員會自動移動過去作答"></div>
         <div class="result-overlay" id="result-overlay" hidden>
           <div class="result-box">
             <div class="trophy" id="result-icon" aria-hidden="true">🏆</div>
@@ -163,13 +154,7 @@
       <footer class="below">
         <div class="hint">
           <div class="hint-icon" aria-hidden="true">✦</div>
-          <div><strong>移動角色碰星星作答</strong><br>答對 +10 分，答錯 −5 分。鍵盤用方向鍵／WASD，也可用畫面方向鍵。</div>
-        </div>
-        <div class="pad" aria-label="觸控方向鍵">
-          <button class="up" data-direction="up" aria-label="向上" aria-pressed="false">▲</button>
-          <button class="left" data-direction="left" aria-label="向左" aria-pressed="false">◀</button>
-          <button class="down" data-direction="down" aria-label="向下" aria-pressed="false">▼</button>
-          <button class="right" data-direction="right" aria-label="向右" aria-pressed="false">▶</button>
+          <div><strong>點選答案星球，角色會自動前往</strong><br>也能點擊空白處移動。答對 +10 分，答錯 −5 分。</div>
         </div>
       </footer>
     </section>
@@ -207,25 +192,6 @@
         return;
       }
 
-      const touchDirections = { up: false, down: false, left: false, right: false };
-      document.querySelectorAll('.pad button').forEach((button) => {
-        const direction = button.dataset.direction;
-        const release = () => {
-          touchDirections[direction] = false;
-          button.setAttribute('aria-pressed', 'false');
-        };
-        button.addEventListener('pointerdown', (event) => {
-          event.preventDefault();
-          touchDirections[direction] = true;
-          button.setAttribute('aria-pressed', 'true');
-          button.setPointerCapture(event.pointerId);
-        });
-        button.addEventListener('pointerup', release);
-        button.addEventListener('pointercancel', release);
-        button.addEventListener('lostpointercapture', release);
-        button.addEventListener('contextmenu', (event) => event.preventDefault());
-      });
-
       class StarIsland extends Phaser.Scene {
         constructor() {
           super('StarIsland');
@@ -235,6 +201,7 @@
           this.solved = 0;
           this.acceptingAnswer = true;
           this.awaitingStage = false;
+          this.moveTarget = null;
           this.targets = [];
           this.labels = [];
           this.feedbackTimer = null;
@@ -246,17 +213,17 @@
           this.physics.world.setBounds(42, 38, 876, 364);
           this.player = this.physics.add.sprite(480, 365, 'explorer');
           this.player.setCollideWorldBounds(true);
-          this.player.body.setSize(34, 38).setOffset(19, 32);
-          this.cursors = this.input.keyboard.createCursorKeys();
-          this.wasd = this.input.keyboard.addKeys('W,A,S,D');
+          this.player.body.setSize(40, 48).setOffset(16, 22);
           this.orbs = this.physics.add.group({ allowGravity: false, immovable: true });
           this.physics.add.overlap(this.player, this.orbs, this.collectAnswer, undefined, this);
-          this.spawnQuestion();
-          this.input.keyboard.on('keydown-ENTER', () => {
-            if (ui.overlay.hidden) return;
-            if (this.awaitingStage) this.continueStage();
-            else this.restartGame();
+          this.input.on('pointerdown', (pointer) => {
+            if (!this.acceptingAnswer) return;
+            this.moveTarget = {
+              x: Phaser.Math.Clamp(pointer.worldX, 42, 918),
+              y: Phaser.Math.Clamp(pointer.worldY, 38, 402)
+            };
           });
+          this.spawnQuestion();
         }
 
         drawIsland() {
@@ -302,23 +269,33 @@
         makeTextures() {
           const hero = this.make.graphics({ x: 0, y: 0, add: false });
           hero.fillStyle(0x2c7d72, .18).fillEllipse(36, 78, 39, 10);
-          hero.fillStyle(0xf07862, 1).fillTriangle(21, 53, 8, 75, 31, 69);
-          hero.fillStyle(0xffb56c, 1).fillTriangle(48, 53, 64, 75, 39, 69);
-          hero.fillStyle(0x277d88, 1).fillRoundedRect(18, 42, 37, 30, 12);
-          hero.lineStyle(3, 0xffffff, 1).strokeRoundedRect(18, 42, 37, 30, 12);
-          hero.fillStyle(0xffd36e, 1).fillCircle(36, 55, 5);
-          hero.fillStyle(0xffd1a0, 1).fillCircle(36, 29, 20);
-          hero.lineStyle(3, 0xffffff, 1).strokeCircle(36, 29, 20);
-          hero.fillStyle(0x18334b, 1).fillCircle(29, 29, 2.1).fillCircle(43, 29, 2.1);
-          hero.lineStyle(2, 0xc26651, 1).beginPath().arc(36, 31, 6, .25, Math.PI - .25, false).strokePath();
-          hero.fillStyle(0x5a78a8, 1).fillTriangle(17, 18, 36, 2, 55, 18);
-          hero.fillStyle(0x7898c4, 1).fillRoundedRect(20, 14, 32, 7, 4);
-          hero.fillStyle(0xffd36e, 1).fillPoints([
-            new Phaser.Geom.Point(36, 3), new Phaser.Geom.Point(38, 8),
-            new Phaser.Geom.Point(43, 10), new Phaser.Geom.Point(38, 12),
-            new Phaser.Geom.Point(36, 17), new Phaser.Geom.Point(34, 12),
-            new Phaser.Geom.Point(29, 10), new Phaser.Geom.Point(34, 8)
-          ], true);
+          hero.fillStyle(0x6f899d, 1).fillRoundedRect(50, 42, 12, 27, 5);
+          hero.fillStyle(0xb8cbd0, 1).fillRoundedRect(53, 47, 8, 16, 3);
+          hero.fillStyle(0xffa65b, 1).fillTriangle(31, 68, 36, 81, 41, 68);
+          hero.fillStyle(0xffd36e, 1).fillTriangle(34, 70, 36, 77, 38, 70);
+          hero.fillStyle(0xeaf0f1, 1).fillRoundedRect(22, 62, 12, 14, 5);
+          hero.fillStyle(0xeaf0f1, 1).fillRoundedRect(39, 62, 12, 14, 5);
+          hero.lineStyle(2, 0x7b94a5, 1).strokeRoundedRect(22, 62, 12, 14, 5).strokeRoundedRect(39, 62, 12, 14, 5);
+          hero.fillStyle(0x344c62, 1).fillRoundedRect(21, 72, 14, 8, 4);
+          hero.fillStyle(0x344c62, 1).fillRoundedRect(38, 72, 14, 8, 4);
+          hero.fillStyle(0xeaf0f1, 1).fillRoundedRect(12, 44, 13, 25, 6);
+          hero.fillStyle(0xeaf0f1, 1).fillRoundedRect(47, 44, 13, 25, 6);
+          hero.lineStyle(2, 0x7b94a5, 1).strokeRoundedRect(12, 44, 13, 25, 6).strokeRoundedRect(47, 44, 13, 25, 6);
+          hero.fillStyle(0xeaf0f1, 1).fillRoundedRect(20, 42, 32, 31, 10);
+          hero.lineStyle(3, 0x7b94a5, 1).strokeRoundedRect(20, 42, 32, 31, 10);
+          hero.fillStyle(0x48677e, 1).fillRoundedRect(27, 49, 18, 15, 4);
+          hero.lineStyle(1, 0xffffff, 1).strokeRoundedRect(27, 49, 18, 15, 4);
+          hero.fillStyle(0x60c2a4, 1).fillRoundedRect(30, 52, 6, 5, 1);
+          hero.fillStyle(0xffd36e, 1).fillCircle(40, 54, 2.5);
+          hero.fillStyle(0xffffff, 1).fillCircle(36, 27, 24);
+          hero.lineStyle(3, 0x7b94a5, 1).strokeCircle(36, 27, 23);
+          hero.fillStyle(0xffd1a0, 1).fillCircle(36, 29, 16);
+          hero.fillStyle(0x9bd8e8, .24).fillCircle(36, 27, 17);
+          hero.lineStyle(2, 0x83c5d7, 1).strokeCircle(36, 27, 17);
+          hero.fillStyle(0xffffff, .9).fillEllipse(28, 18, 8, 4);
+          hero.fillStyle(0x18334b, 1).fillCircle(31, 29, 1.8).fillCircle(41, 29, 1.8);
+          hero.lineStyle(2, 0xc26651, 1).beginPath().arc(36, 31, 5, .25, Math.PI - .25, false).strokePath();
+          hero.fillStyle(0xffd36e, 1).fillCircle(15, 53, 3);
           hero.generateTexture('explorer', 72, 84);
           hero.destroy();
 
@@ -341,6 +318,7 @@
           const choices = Phaser.Utils.Array.Shuffle([answer, ...distractors]);
           const anchors = Phaser.Utils.Array.Shuffle([[160, 157], [480, 246], [800, 157]]);
           this.acceptingAnswer = !gracePeriod;
+          this.moveTarget = null;
           this.clearTargets();
           // Each question starts from the safe launch pad so the previous answer
           // position cannot overlap a new orb and trigger an accidental penalty.
@@ -386,6 +364,7 @@
         collectAnswer(player, orb) {
           if (!this.acceptingAnswer || !orb.active) return;
           this.acceptingAnswer = false;
+          this.moveTarget = null;
           const q = stages[this.stageIndex].questions[this.questionIndex];
           const answer = q.a * q.b;
           const isCorrect = orb.getData('correct');
@@ -424,6 +403,7 @@
           const next = stages[this.stageIndex + 1];
           this.awaitingStage = true;
           this.acceptingAnswer = false;
+          this.moveTarget = null;
           this.clearTargets();
           this.player.setPosition(480, 365).setVelocity(0, 0);
           ui.resultIcon.textContent = '✦';
@@ -499,25 +479,26 @@
           this.score = 0;
           this.solved = 0;
           this.awaitingStage = false;
+          this.moveTarget = null;
           this.player.setPosition(480, 365).setVelocity(0, 0);
-          Object.keys(touchDirections).forEach(direction => { touchDirections[direction] = false; });
           ui.overlay.hidden = true;
           this.spawnQuestion();
         }
 
         update(time) {
-          if (!this.acceptingAnswer) {
+          if (!this.acceptingAnswer || !this.moveTarget) {
             this.player.setVelocity(0, 0);
           } else {
-            const left = this.cursors.left.isDown || this.wasd.A.isDown || touchDirections.left;
-            const right = this.cursors.right.isDown || this.wasd.D.isDown || touchDirections.right;
-            const up = this.cursors.up.isDown || this.wasd.W.isDown || touchDirections.up;
-            const down = this.cursors.down.isDown || this.wasd.S.isDown || touchDirections.down;
-            const dx = Number(right) - Number(left);
-            const dy = Number(down) - Number(up);
-            const length = Math.hypot(dx, dy) || 1;
+            const dx = this.moveTarget.x - this.player.x;
+            const dy = this.moveTarget.y - this.player.y;
+            const distance = Math.hypot(dx, dy);
             const speed = 220;
-            this.player.setVelocity((dx / length) * speed, (dy / length) * speed);
+            if (distance < 10) {
+              this.moveTarget = null;
+              this.player.setVelocity(0, 0);
+            } else {
+              this.player.setVelocity((dx / distance) * speed, (dy / distance) * speed);
+            }
             if (dx < 0) this.player.setFlipX(true);
             if (dx > 0) this.player.setFlipX(false);
           }
