@@ -713,9 +713,9 @@
         createReward() {
           demoText(this, 280, 50, '點擊金幣，收集獎勵', 20)
           let score = 0
-          let seconds = 12
+          let seconds = 20
           const scoreText = demoText(this, 118, 91, '分數 0', 16, '#176d68')
-          const timeText = demoText(this, 442, 91, '時間 12', 16, '#a34c32')
+          const timeText = demoText(this, 442, 91, '時間 20', 16, '#a34c32')
           let active = false
           let timerEvent = null
           const finish = () => {
@@ -723,6 +723,8 @@
             active = false
             if (timerEvent) timerEvent.remove(false)
             setDemoStatus(this, `時間到，總共得到 ${score} 分`)
+            start.text.setText('再玩一次')
+            showDemoButton(start)
           }
           const coins = []
           const positions = [[145, 150], [280, 150], [415, 150], [210, 230], [350, 230]]
@@ -742,11 +744,19 @@
           })
           const start = demoButton(this, 280, 114, 120, 36, '開始收集', () => {
             if (active) return
+            score = 0
+            seconds = 20
+            scoreText.setText('分數 0')
+            timeText.setText('時間 20')
+            coins.forEach(coin => {
+              showDemoButton(coin)
+              coin.bg.setFillStyle(0xfff1c2)
+            })
             active = true
             hideDemoButton(start)
             timerEvent = this.time.addEvent({
               delay: 1000,
-              repeat: 11,
+              repeat: 19,
               callback: () => {
                 seconds -= 1
                 timeText.setText(`時間 ${seconds}`)
